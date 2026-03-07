@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinetic Brutalism Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700&family=Cormorant:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Cormorant+Infant:wght@300;400;500;600;700&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Bodoni:wght@400;500;600;700&family=Newsreader:wght@400;500;600;700&family=Noto+Serif+Display:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Source+Serif+4:wght@300;400;500;600;700&family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        :root { 
+            --font-serif: 'DM Serif Display', serif; 
+            --font-sans: 'Switzer', sans-serif; 
+            --font-mono: 'IBM Plex Mono', monospace;
+            --hero-title-size-mobile: 7vw;
+            --hero-title-size-desktop: 4.3vw;
+            --hero-title-line-height: 0.82;
+            --hero-title-letter-spacing: 0.025em;
+            --hero-video-filter: grayscale(1) invert(1);
+        }
+        @font-face {
+            font-family: 'SangBleu Kingdom';
+            src: url('./assets/fonts/SangBleuKingdom-Light.otf') format('opentype');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'SangBleu Kingdom';
+            src: url('./assets/fonts/SangBleuKingdom-Regular.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'SangBleu Kingdom';
+            src: url('./assets/fonts/SangBleuKingdom-Medium.otf') format('opentype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'SangBleu Kingdom';
+            src: url('./assets/fonts/SangBleuKingdom-Bold.otf') format('opentype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Violet Sans';
+            src: url('./assets/fonts/VioletSans-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Verdigris MVB Pro Big';
+            src: url('./assets/fonts/VerdigrisMVBPro-Big-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Verdigris MVB Pro Big';
+            src: url('./assets/fonts/VerdigrisMVBPro-Big-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Verdigris MVB Pro Text';
+            src: url('./assets/fonts/VerdigrisMVBPro-Text-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Verdigris MVB Pro Text';
+            src: url('./assets/fonts/VerdigrisMVBPro-Text-Bold.ttf') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Verdigris MVB Pro Text';
+            src: url('./assets/fonts/VerdigrisMVBPro-Text-Italic.ttf') format('truetype');
+            font-weight: 400;
+            font-style: italic;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Verdigris MVB Pro Text';
+            src: url('./assets/fonts/VerdigrisMVBPro-Text-BoldItalic.ttf') format('truetype');
+            font-weight: 700;
+            font-style: italic;
+            font-display: swap;
+        }
+        .font-serif { font-family: var(--font-serif); }
+        .font-sans { font-family: var(--font-sans); }
+        .font-mono-label {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+        .video-aware-text {
+            mix-blend-mode: difference;
+            color: #ffffff !important;
+            transition: color 0.2s ease, mix-blend-mode 0.2s ease;
+        }
+        body.nav-on-light .video-aware-text {
+            mix-blend-mode: normal;
+            color: #111111 !important;
+        }
+        #hero-img {
+            filter: var(--hero-video-filter);
+        }
+        #hero-title {
+            font-size: var(--hero-title-size-mobile);
+            line-height: var(--hero-title-line-height);
+            letter-spacing: var(--hero-title-letter-spacing);
+            mix-blend-mode: difference;
+        }
+        @media (min-width: 768px) {
+            #hero-title {
+                font-size: var(--hero-title-size-desktop);
+            }
+        }
+        
+        /* Custom Cursor */
+        body { cursor: auto; }
+        body.cursor-effect-on { cursor: none; }
+        #cursor {
+            position: fixed; top: 0; left: 0; width: 24px; height: 24px;
+            background-color: white; border-radius: 50%; pointer-events: none;
+            z-index: 9999; mix-blend-mode: difference;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: width 0.4s cubic-bezier(0.19, 1, 0.22, 1), height 0.4s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.2s ease;
+        }
+        body.cursor-effect-on #cursor { opacity: 1; }
+        .cursor-expand { width: 80px !important; height: 80px !important; }
+        
+        /* Lenis Smooth Scroll */
+        html.lenis, html.lenis body { height: auto; width: 100vw; overflow-x: hidden; }
+        .lenis.lenis-smooth { scroll-behavior: auto !important; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+        
+        /* Image Utilities */
+        .img-parallax-container { overflow: hidden; }
+        .img-parallax { transform: scale(1.1); }
+        
+        /* Brutalist Index Grid */
+        .index-row-container:hover .index-text { color: #888; }
+        .font-display {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            text-transform: none;
+            line-height: 0.9;
+            letter-spacing: -0.01em;
+        }
+        .work-card img {
+            filter: contrast(1.1);
+            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
+        }
+        .work-card:hover img {
+            transform: scale(1.05);
+            filter: contrast(1);
+        }
+        .statement-title {
+            font-size: calc(var(--hero-title-size-mobile) * 0.86);
+            line-height: 0.94;
+            letter-spacing: -0.02em;
+        }
+        @media (min-width: 768px) {
+            .statement-title {
+                font-size: calc(var(--hero-title-size-desktop) * 0.86);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen bg-white text-black font-sans relative w-full overflow-hidden">
+        <!-- Custom Cursor -->
+        <div id="cursor"></div>
+
+        <!-- Minimal Navigation -->
+        <nav class="fixed top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-50 text-white pointer-events-none">
+            <a href="#" id="nav-brand" class="text-sm md:text-base font-semibold tracking-[0.18em] leading-none pointer-events-auto cursor-target video-aware-text" style="font-variant-caps: all-small-caps;">
+                sl
+            </a>
+            <div class="text-sm font-medium tracking-widest uppercase flex flex-col items-end gap-1 pointer-events-auto cursor-target">
+                <a href="#work" class="hover:opacity-50 transition-opacity video-aware-text">Works</a>
+                <a href="#index" class="hover:opacity-50 transition-opacity video-aware-text">Index</a>
+                <a href="#contact" class="hover:opacity-50 transition-opacity video-aware-text">Contact</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="relative h-[100svh] w-full flex flex-col justify-center p-6 md:p-10 overflow-hidden" id="hero">
+            <div class="absolute inset-0 z-0 bg-black">
+                <video id="hero-img" class="w-full h-full object-cover opacity-80 scale-110" autoplay muted loop playsinline preload="auto">
+                    <source src="./assets/hero.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="relative z-10 w-full text-white">
+                <h1 id="hero-title" class="font-serif flex flex-col items-center text-center">
+                    <span class="block overflow-hidden"><span class="block hero-title-word">studio</span></span>
+                    <span class="block overflow-hidden"><span class="block hero-title-word">sébastien</span></span>
+                    <span class="block overflow-hidden"><span class="block hero-title-word">lacomblez</span></span>
+                </h1>
+            </div>
+            <div id="dev-mode-panel" class="hidden absolute top-4 left-4 md:top-6 md:left-6 z-30 w-[min(92vw,380px)] bg-black/70 text-white border border-white/40 rounded-md p-3 md:p-4 backdrop-blur-sm">
+                <p class="text-[10px] tracking-[0.22em] uppercase text-white/75 mb-2">Dev Mode</p>
+                <label for="font-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Hero Font</label>
+                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                    <button id="font-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                    <select id="font-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                    </select>
+                    <button id="font-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                </div>
+                <label for="font-weight-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Weight</label>
+                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                    <button id="font-weight-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                    <select id="font-weight-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                    </select>
+                    <button id="font-weight-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                </div>
+                <label for="grayscale-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Grayscale</label>
+                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                    <button id="grayscale-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                    <select id="grayscale-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                    </select>
+                    <button id="grayscale-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                </div>
+                <label for="invert-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Invert</label>
+                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                    <button id="invert-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                    <select id="invert-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                    </select>
+                    <button id="invert-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                </div>
+                <label for="cursor-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Mouse Effect</label>
+                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                    <button id="cursor-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                    <select id="cursor-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                    </select>
+                    <button id="cursor-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                </div>
+                <label for="hero-size-mobile" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Mobile (vw)</label>
+                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                    <input id="hero-size-mobile" type="range" min="6" max="18" step="0.1" class="w-full accent-white">
+                    <span id="hero-size-mobile-value" class="text-[11px] text-right text-white/80 tabular-nums">7.0</span>
+                </div>
+                <label for="hero-size-desktop" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Desktop (vw)</label>
+                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                    <input id="hero-size-desktop" type="range" min="4" max="14" step="0.1" class="w-full accent-white">
+                    <span id="hero-size-desktop-value" class="text-[11px] text-right text-white/80 tabular-nums">4.3</span>
+                </div>
+                <label for="hero-letter-spacing" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Letter Spacing (em)</label>
+                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                    <input id="hero-letter-spacing" type="range" min="-0.12" max="0.12" step="0.005" class="w-full accent-white">
+                    <span id="hero-letter-spacing-value" class="text-[11px] text-right text-white/80 tabular-nums">+0.025</span>
+                </div>
+                <label for="hero-line-height" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Line Height</label>
+                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                    <input id="hero-line-height" type="range" min="0.65" max="1.3" step="0.01" class="w-full accent-white">
+                    <span id="hero-line-height-value" class="text-[11px] text-right text-white/80 tabular-nums">0.82</span>
+                </div>
+                <p id="font-picker-value" class="mt-2 text-[11px] text-white/70">Current: Verdigris MVB Pro Text 700</p>
+                <p class="mt-2 text-[10px] tracking-[0.08em] uppercase text-white/55">Toggle: Ctrl + Shift + D</p>
+            </div>
+        </section>
+
+        <!-- Asymmetric Work Grid -->
+        <section class="w-full px-6 md:px-10 py-24 md:py-48 bg-white text-black" id="work">
+            <!-- Statement Section -->
+            <div class="max-w-[1600px] mx-auto mb-24 md:mb-44">
+                <h2 class="statement-title font-sans font-semibold gs-reveal mb-8 md:mb-12 text-center max-w-[14ch] mx-auto">
+                    Rendre l'expérience<br>du monde plus dense
+                </h2>
+                <div class="w-20 h-px bg-black/25 mx-auto mb-10 md:mb-14 gs-reveal"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-24 gap-y-10 font-sans text-[1rem] md:text-[1.06rem] leading-[1.72] tracking-[-0.002em] text-black/80 gs-reveal max-w-[1220px] mx-auto">
+                    <div class="space-y-8">
+                        <p>
+                            Entrer dans un jardin, ici, revient d'abord à entrer dans un processus.
+                            Le paysage n'y apparaît pas comme décor, mais comme matière en travail: stratifiée, traversée, instable. Chaque projet s'ouvre par une lecture du site, de ses plans visibles et souterrains, de ses sols, de ses circulations, de ses milieux déjà là. Le paysage n'y est pas seulement tracé. Il s'écrit, avec des plantes, des microclimats, des densités, des temporalités.
+                        </p>
+                        <p>
+                            À l'endroit où se touchent art, architecture et sciences du vivant, la pratique refuse les catégories trop nettes.
+                            Le jardin y devient simultanément construction, biotope, forme sensible. Les compositions végétales se déploient en strates, en rythmes, en intensités saisonnières. Il ne s'agit pas d'imposer une figure, mais de rendre lisibles des dynamiques, d'activer ce qui travaille déjà le lieu.
+                        </p>
+                    </div>
+                    <div class="space-y-8">
+                        <p>
+                            Les jardins conçus par le Studio Sébastien Lacomblez ne sont pas des objets clos.
+                            Ils évoluent, se déplacent, se densifient. Une structure initiale est posée, une palette orientée, une architecture du vivant engagée; puis l'oeuvre se décentre, portée par la croissance, les interactions d'espèces, les cycles.
+                        </p>
+                        <p>
+                            Entre recherche paysagère, laboratoire du vivant et conception spatiale, le studio développe une pratique de précision et d'écoute.
+                            Chaque projet devient un territoire en devenir: une composition ouverte où paysage, écologie et geste artistique se nouent, sans se confondre.
+                        </p>
+                        <p class="pt-1 md:pt-2">
+                            <a href="#contact" class="underline decoration-black decoration-[1px] underline-offset-[0.16em] cursor-target">
+                                Rentrons en contact.
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Grid - Asymmetric Layout -->
+            <div class="space-y-40 md:space-y-64">
+                
+                <!-- Row 1: Large & Offset -->
+                <div class="grid md:grid-cols-12 gap-10">
+                    <div class="md:col-span-7 gs-reveal">
+                        <a href="#" id="work-link-1" class="work-card block group cursor-target">
+                            <div class="aspect-[4/5] md:aspect-[16/9] w-full overflow-hidden">
+                                <img src="./assets/jardin-a6k.jpg" alt="Jardin d'A6K" class="w-full h-full object-cover">
+                            </div>
+                            <div class="mt-6">
+                                <h3 class="text-2xl font-display">Jardin d'A6K</h3>
+                                <p class="font-mono-label text-[10px] opacity-55 mt-1">Charleroi — 2019</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="md:col-span-4 md:col-start-9 md:pt-40 gs-reveal">
+                        <a href="#" id="work-link-2" class="work-card block group cursor-target">
+                            <div class="aspect-square w-full overflow-hidden">
+                                <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900584494-5ba1b7c0/img-04.jpg" alt="Project Two" class="w-full h-full object-cover">
+                            </div>
+                            <div class="mt-6">
+                                <h3 class="text-2xl font-display">Fracture</h3>
+                                <p class="font-mono-label text-[10px] opacity-55 mt-1">Experimental Film</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Row 2: Overlapping -->
+                <div class="grid md:grid-cols-12">
+                    <div class="md:col-span-5 md:col-start-2 gs-reveal">
+                        <a href="#" id="work-link-3" class="work-card block group cursor-target">
+                            <div class="aspect-[3/4] w-full overflow-hidden">
+                                <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900586080-03e32c9d/img-11.jpg" alt="Project Three" class="w-full h-full object-cover">
+                            </div>
+                            <div class="mt-6">
+                                <h3 class="text-2xl font-display">Silent Void</h3>
+                                <p class="font-mono-label text-[10px] opacity-55 mt-1">Editorial Design</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="md:col-span-5 md:col-start-8 mt-0 md:-mt-40 gs-reveal">
+                        <a href="#" id="work-link-4" class="work-card block group cursor-target">
+                            <div class="aspect-[4/5] w-full overflow-hidden">
+                                <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588644-398b820c/img-22.jpg" alt="Project Four" class="w-full h-full object-cover">
+                            </div>
+                            <div class="mt-6">
+                                <h3 class="text-2xl font-display">Kinetic Structure</h3>
+                                <p class="font-mono-label text-[10px] opacity-55 mt-1">CGI / Motion</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Brutalist Spreadsheet Index Section -->
+        <section class="w-full px-4 md:px-10 pt-10 md:pt-16 pb-8 md:pb-16 bg-white relative" id="index">
+            <!-- Hover Image Reveal Container -->
+            <div id="index-hover-img" class="fixed top-0 left-0 w-[60vw] md:w-[25vw] aspect-[4/5] pointer-events-none z-30 opacity-0 transition-opacity duration-300 overflow-hidden hidden md:block">
+                <img id="index-img-target" src="" class="w-full h-full object-cover scale-110 transition-transform duration-700" alt="Preview">
+            </div>
+
+            <!-- Table Header -->
+            <div class="hidden md:grid grid-cols-12 gap-4 font-mono-label text-[0.65rem] text-black mb-4 px-2 gs-reveal">
+                <div class="col-span-5">Référence projet</div>
+                <div class="col-span-4">Collaborateur</div>
+                <div class="col-span-2">Typologie</div>
+                <div class="col-span-1 text-right">Année</div>
+            </div>
+
+            <!-- The List (Zero padding/margins to mimic text block) -->
+            <div class="flex flex-col w-full relative group/index text-black gs-reveal" id="index-list">
+                <!-- Injecting 20 rows with exact image URLs 16 to 35 -->
+                <script>
+                    const indexData = [
+                        { name: "Sector Null", client: "Bureau X", type: "Identity", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587266-914e4d8d/img-16.jpg" },
+                        { name: "Prism Collective", client: "Art Basel", type: "Motion", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587503-d998535c/img-17.jpg" },
+                        { name: "Monolith Base", client: "Archi Group", type: "Spatial", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587732-4319a5f2/img-18.jpg" },
+                        { name: "Zenith Finance", client: "FinTech Co", type: "Product", year: "2022", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587961-ef4e1a20/img-19.jpg" },
+                        { name: "Void Cult", client: "LVMH", type: "Editorial", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588183-67a3ef7f/img-20.jpg" },
+                        { name: "Shift Logistics", client: "Global Freight", type: "Brand", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588411-2c806949/img-21.jpg" },
+                        { name: "Opaque Gallery", client: "Art Studio", type: "Web", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588644-398b820c/img-22.jpg" },
+                        { name: "Vertex Data", client: "Data Inc", type: "System", year: "2021", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588881-ff46852f/img-23.jpg" },
+                        { name: "Flux Energy", client: "National Grid", type: "Platform", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589108-d0468bcf/img-24.jpg" },
+                        { name: "Raw Material", client: "Object Dept", type: "3D", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589341-26f27353/img-25.jpg" },
+                        { name: "Grid Lock", client: "Urban Planning", type: "Campaign", year: "2022", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589570-7938fe58/img-26.jpg" },
+                        { name: "Helix Bio", client: "Biotech Lab", type: "Identity", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589797-46dbdc82/img-27.jpg" },
+                        { name: "Static Noise", client: "Warp Records", type: "Cover", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590253-5ebb7f0a/img-29.jpg" },
+                        { name: "Frame Works", client: "Photo Agency", type: "Digital", year: "2021", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590476-d073bbf7/img-30.jpg" },
+                        { name: "Horizon Auto", client: "Polestar", type: "UI", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590706-90ba4881/img-31.jpg" },
+                        { name: "Core Hardware", client: "Tech Inc", type: "Packaging", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590928-4ff33341/img-32.jpg" },
+                        { name: "Echo System", client: "Sound Dept", type: "Web", year: "2022", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900591165-b9613dfe/img-33.jpg" },
+                        { name: "Nexus Net", client: "Telecom", type: "App", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900591643-3a35965f/img-35.jpg" },
+                        { name: "Apex Sports", client: "Nike", type: "Campaign", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587266-914e4d8d/img-16.jpg" },
+                        { name: "Terminus", client: "Real Estate", type: "Brand", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587503-d998535c/img-17.jpg" }
+                    ];
+                    
+                    const listContainer = document.getElementById('index-list');
+                    indexData.forEach(item => {
+                        const row = document.createElement('div');
+                        row.className = 'index-row-container grid grid-cols-2 md:grid-cols-12 gap-4 text-xl md:text-3xl lg:text-[2.5vw] font-medium tracking-tighter uppercase leading-[1.05] py-1 cursor-target transition-all duration-300';
+                        row.setAttribute('data-img', item.img);
+                        row.innerHTML = `
+                            <div class="col-span-1 md:col-span-5 index-text transition-colors duration-300">${item.name}</div>
+                            <div class="hidden md:block col-span-4 index-text transition-colors duration-300">${item.client}</div>
+                            <div class="hidden md:block col-span-2 index-text transition-colors duration-300">${item.type}</div>
+                            <div class="col-span-1 md:col-span-1 text-right index-text transition-colors duration-300">${item.year}</div>
+                        `;
+                        listContainer.appendChild(row);
+                    });
+                </script>
+            </div>
+        </section>
+
+        <!-- Minimal Contact Footer -->
+        <footer class="w-full min-h-[36vh] flex flex-col items-center justify-center bg-white relative z-10 px-6 py-12 md:py-16" id="contact">
+            <a href="mailto:hello@sebastienlacomblez.art" id="footer-contact-link" class="font-serif text-[7vw] md:text-[2.4vw] leading-none tracking-tight text-[#222] hover:opacity-70 transition-opacity duration-500 cursor-target text-center">
+                hello@sebastienlacomblez.art
+            </a>
+            <div class="absolute bottom-3 md:bottom-5 left-0 w-full px-6 flex items-center justify-between font-mono-label text-[0.62rem] text-black/75">
+                <a href="#" class="hover:opacity-50 transition-opacity whitespace-nowrap">Terms of Service</a>
+                <a href="#" class="hover:opacity-50 transition-opacity whitespace-nowrap text-center">Cookie Policy</a>
+                <a href="#" class="hover:opacity-50 transition-opacity whitespace-nowrap text-right">Accessibility</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Interactions Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+            // 1. Initialize Lenis for buttery smooth scrolling
+            if (typeof Lenis !== 'undefined') {
+                const lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    orientation: 'vertical',
+                    gestureOrientation: 'vertical',
+                    smoothWheel: true,
+                    wheelMultiplier: 1,
+                    smoothTouch: false,
+                    touchMultiplier: 2,
+                    infinite: false,
+                });
+
+                lenis.on('scroll', ScrollTrigger.update);
+                gsap.ticker.add((time) => { lenis.raf(time * 1000) });
+                gsap.ticker.lagSmoothing(0);
+            } else {
+                console.warn('Lenis library not loaded, falling back to native scroll');
+            }
+
+            // 2. Custom Magnetic Cursor Logic (Dev-toggleable, default OFF)
+            let setCursorEffectState = null;
+            const cursor = document.getElementById('cursor');
+            if (cursor && window.innerWidth > 768) { // Only on desktop
+                let xTo = gsap.quickTo(cursor, "x", { duration: 0.15, ease: "power3" });
+                let yTo = gsap.quickTo(cursor, "y", { duration: 0.15, ease: "power3" });
+                let pointerX = window.innerWidth / 2;
+                let pointerY = window.innerHeight / 2;
+                let cursorEffectEnabled = false;
+
+                setCursorEffectState = (enabled) => {
+                    cursorEffectEnabled = Boolean(enabled);
+                    document.body.classList.toggle('cursor-effect-on', cursorEffectEnabled);
+                    cursor.classList.remove('cursor-expand');
+                    if (cursorEffectEnabled) {
+                        xTo(pointerX);
+                        yTo(pointerY);
+                    }
+                    localStorage.setItem('devCursorEffect', cursorEffectEnabled ? 'on' : 'off');
+                };
+
+                window.addEventListener("mousemove", (e) => {
+                    pointerX = e.clientX;
+                    pointerY = e.clientY;
+                    if (!cursorEffectEnabled) return;
+                    xTo(pointerX);
+                    yTo(pointerY);
+                });
+
+                const hoverTargets = document.querySelectorAll('.cursor-target, a');
+                hoverTargets.forEach((target) => {
+                    target.addEventListener('mouseenter', () => {
+                        if (cursorEffectEnabled) cursor.classList.add('cursor-expand');
+                    });
+                    target.addEventListener('mouseleave', () => cursor.classList.remove('cursor-expand'));
+                });
+
+                const savedCursorEffect = localStorage.getItem('devCursorEffect');
+                setCursorEffectState(savedCursorEffect === 'on');
+            } else {
+                document.body.classList.remove('cursor-effect-on');
+            }
+
+            // 3. Hero Entrance Animation
+            gsap.to("#hero-img", { scale: 1, opacity: 1, duration: 2.5, ease: "power3.out" });
+
+            // 4. Scroll Reveal Animations (Staggered)
+            const revealElements = document.querySelectorAll('.gs-reveal');
+            revealElements.forEach(el => {
+                gsap.fromTo(el, 
+                    { y: 60, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1.2,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        }
+                    }
+                );
+            });
+
+            // 5. Image Parallax inside containers
+            const parallaxImages = document.querySelectorAll('.img-parallax');
+            parallaxImages.forEach(img => {
+                gsap.to(img, {
+                    yPercent: 15,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: img.parentElement,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                });
+            });
+
+            const workCardImages = document.querySelectorAll('#work .work-card img');
+            workCardImages.forEach(img => {
+                gsap.fromTo(img, 
+                    { y: -30 },
+                    { 
+                        y: 30, 
+                        scrollTrigger: {
+                            trigger: img.closest('.work-card'),
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: true
+                        }
+                    }
+                );
+            });
+
+            // 6. Index Hover Image Logic
+            const indexRows = document.querySelectorAll('.index-row-container');
+            const hoverImgContainer = document.getElementById('index-hover-img');
+            const hoverImgTarget = document.getElementById('index-img-target');
+
+            if(hoverImgContainer && hoverImgTarget && window.innerWidth > 768) {
+                const centerHoverImage = () => {
+                    const centerX = (window.innerWidth - hoverImgContainer.offsetWidth) / 2;
+                    const centerY = (window.innerHeight - hoverImgContainer.offsetHeight) / 2;
+                    gsap.set(hoverImgContainer, { x: centerX, y: centerY });
+                };
+                centerHoverImage();
+                window.addEventListener('resize', centerHoverImage);
+
+                indexRows.forEach(row => {
+                    row.addEventListener('mouseenter', (e) => {
+                        const imgSrc = row.getAttribute('data-img');
+                        if(hoverImgTarget.src !== imgSrc) {
+                            // Slight zoom effect on change
+                            gsap.fromTo(hoverImgTarget, {scale: 1.2}, {scale: 1, duration: 0.7, ease: "power2.out"});
+                            hoverImgTarget.src = imgSrc;
+                        }
+                        centerHoverImage();
+                        gsap.to(hoverImgContainer, { opacity: 1, duration: 0.3 });
+                    });
+                });
+                
+                // Hide when leaving the list
+                const listContainer = document.getElementById('index-list');
+                listContainer.addEventListener('mouseleave', () => {
+                     gsap.to(hoverImgContainer, { opacity: 0, duration: 0.3 });
+                });
+            }
+
+            // 7. Dev Mode Hero Controls (Ctrl + Shift + D)
+            const devModePanel = document.getElementById('dev-mode-panel');
+            const fontPicker = document.getElementById('font-picker');
+            const fontWeightPicker = document.getElementById('font-weight-picker');
+            const fontPickerValue = document.getElementById('font-picker-value');
+            const fontPrev = document.getElementById('font-prev');
+            const fontNext = document.getElementById('font-next');
+            const fontWeightPrev = document.getElementById('font-weight-prev');
+            const fontWeightNext = document.getElementById('font-weight-next');
+            const grayscalePrev = document.getElementById('grayscale-prev');
+            const grayscalePicker = document.getElementById('grayscale-picker');
+            const grayscaleNext = document.getElementById('grayscale-next');
+            const invertPrev = document.getElementById('invert-prev');
+            const invertPicker = document.getElementById('invert-picker');
+            const invertNext = document.getElementById('invert-next');
+            const cursorEffectPrev = document.getElementById('cursor-effect-prev');
+            const cursorEffectPicker = document.getElementById('cursor-effect-picker');
+            const cursorEffectNext = document.getElementById('cursor-effect-next');
+            const heroSizeMobile = document.getElementById('hero-size-mobile');
+            const heroSizeDesktop = document.getElementById('hero-size-desktop');
+            const heroLetterSpacing = document.getElementById('hero-letter-spacing');
+            const heroLineHeight = document.getElementById('hero-line-height');
+            const heroSizeMobileValue = document.getElementById('hero-size-mobile-value');
+            const heroSizeDesktopValue = document.getElementById('hero-size-desktop-value');
+            const heroLetterSpacingValue = document.getElementById('hero-letter-spacing-value');
+            const heroLineHeightValue = document.getElementById('hero-line-height-value');
+            const heroVideo = document.getElementById('hero-img');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSection = document.getElementById('hero');
+            const videoAwareTargets = Array.from(document.querySelectorAll('.video-aware-text'));
+            const syncNavToneWithBackground = () => {
+                if (!heroSection) return;
+                const heroBottom = heroSection.getBoundingClientRect().bottom;
+                document.body.classList.toggle('nav-on-light', heroBottom <= 0);
+            };
+            syncNavToneWithBackground();
+            window.addEventListener('scroll', syncNavToneWithBackground, { passive: true });
+            window.addEventListener('resize', syncNavToneWithBackground);
+
+            const serifFontOptions = [
+                { label: "DM Serif Display (Default)", family: "'DM Serif Display', serif", googleName: "DM Serif Display", weights: [400] },
+                { label: "Violet Sans", family: "'Violet Sans', sans-serif", googleName: "Violet Sans", weights: [400] },
+                { label: "Verdigris MVB Pro Big", family: "'Verdigris MVB Pro Big', serif", googleName: "Verdigris MVB Pro Big", weights: [400, 700] },
+                { label: "Verdigris MVB Pro Text", family: "'Verdigris MVB Pro Text', serif", googleName: "Verdigris MVB Pro Text", weights: [400, 700] },
+                { label: "SangBleu Kingdom", family: "'SangBleu Kingdom', serif", googleName: "SangBleu Kingdom", weights: [300, 400, 500, 700] },
+                { label: "Bodoni Moda", family: "'Bodoni Moda', serif", googleName: "Bodoni Moda", weights: [400, 500, 600, 700] },
+                { label: "Libre Bodoni", family: "'Libre Bodoni', serif", googleName: "Libre Bodoni", weights: [400, 500, 600, 700] },
+                { label: "Playfair Display", family: "'Playfair Display', serif", googleName: "Playfair Display", weights: [400, 500, 600, 700] },
+                { label: "Cormorant Garamond", family: "'Cormorant Garamond', serif", googleName: "Cormorant Garamond", weights: [400, 500, 600, 700] },
+                { label: "Newsreader", family: "'Newsreader', serif", googleName: "Newsreader", weights: [400, 500, 600, 700] },
+                { label: "Noto Serif Display", family: "'Noto Serif Display', serif", googleName: "Noto Serif Display", weights: [400, 500, 600, 700] },
+                { label: "Cormorant", family: "'Cormorant', serif", googleName: "Cormorant", weights: [300, 400, 500, 600, 700] },
+                { label: "Cormorant Infant", family: "'Cormorant Infant', serif", googleName: "Cormorant Infant", weights: [300, 400, 500, 600, 700] },
+                { label: "Source Serif 4", family: "'Source Serif 4', serif", googleName: "Source Serif 4", weights: [300, 400, 500, 600, 700] },
+                { label: "Spectral", family: "'Spectral', serif", googleName: "Spectral", weights: [300, 400, 500, 600, 700] }
+            ];
+            const binaryOptions = [
+                { label: "Off", value: "off" },
+                { label: "On", value: "on" }
+            ];
+            const cursorEffectOptions = [
+                { label: "Off", value: "off" },
+                { label: "On", value: "on" }
+            ];
+
+            if (
+                devModePanel &&
+                fontPicker &&
+                fontWeightPicker &&
+                fontPickerValue &&
+                fontPrev &&
+                fontNext &&
+                fontWeightPrev &&
+                fontWeightNext &&
+                grayscalePrev &&
+                grayscalePicker &&
+                grayscaleNext &&
+                invertPrev &&
+                invertPicker &&
+                invertNext &&
+                cursorEffectPrev &&
+                cursorEffectPicker &&
+                cursorEffectNext &&
+                heroSizeMobile &&
+                heroSizeDesktop &&
+                heroLetterSpacing &&
+                heroLineHeight &&
+                heroSizeMobileValue &&
+                heroSizeDesktopValue &&
+                heroLetterSpacingValue &&
+                heroLineHeightValue &&
+                heroVideo &&
+                heroTitle
+            ) {
+                const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+                const getStoredNumber = (key, fallback) => {
+                    const parsedValue = Number(localStorage.getItem(key));
+                    return Number.isFinite(parsedValue) ? parsedValue : fallback;
+                };
+                const signed = (value, decimals) => {
+                    const fixed = value.toFixed(decimals);
+                    return value > 0 ? `+${fixed}` : fixed;
+                };
+
+                serifFontOptions.forEach((fontOption) => {
+                    const option = document.createElement('option');
+                    option.value = fontOption.family;
+                    option.textContent = fontOption.label;
+                    fontPicker.appendChild(option);
+                });
+                binaryOptions.forEach((opt) => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    grayscalePicker.appendChild(option.cloneNode(true));
+                    invertPicker.appendChild(option.cloneNode(true));
+                });
+                cursorEffectOptions.forEach((cursorEffectOption) => {
+                    const option = document.createElement('option');
+                    option.value = cursorEffectOption.value;
+                    option.textContent = cursorEffectOption.label;
+                    cursorEffectPicker.appendChild(option);
+                });
+
+                const getFontConfig = (fontFamily) => {
+                    return serifFontOptions.find((option) => option.family === fontFamily) || serifFontOptions[0];
+                };
+
+                const refreshWeightOptions = (fontConfig, preferredWeight) => {
+                    fontWeightPicker.innerHTML = '';
+                    fontConfig.weights.forEach((fontWeight) => {
+                        const option = document.createElement('option');
+                        option.value = String(fontWeight);
+                        option.textContent = String(fontWeight);
+                        fontWeightPicker.appendChild(option);
+                    });
+                    const parsedPreferredWeight = Number(preferredWeight);
+                    const effectiveWeight = fontConfig.weights.includes(parsedPreferredWeight)
+                        ? parsedPreferredWeight
+                        : fontConfig.weights[0];
+                    fontWeightPicker.value = String(effectiveWeight);
+                    return effectiveWeight;
+                };
+
+                const loadFontFace = (fontName, fontWeight) => {
+                    if (!fontName || !document.fonts || !document.fonts.load) return;
+                    document.fonts.load(`${fontWeight} 48px "${fontName}"`).catch(() => {});
+                };
+
+                const applyHeroFont = (fontFamily, fontWeight) => {
+                    heroTitle.style.fontFamily = fontFamily;
+                    heroTitle.style.fontWeight = String(fontWeight);
+                    const matched = serifFontOptions.find((option) => option.family === fontFamily);
+                    loadFontFace(matched ? matched.googleName : null, fontWeight);
+                    fontPickerValue.textContent = `Current: ${matched ? matched.label : fontFamily} ${fontWeight}`;
+                    localStorage.setItem('devHeroFont', fontFamily);
+                    localStorage.setItem('devHeroFontWeight', String(fontWeight));
+                };
+                const updateVideoFilters = () => {
+                    const isGrayscale = grayscalePicker.value === 'on';
+                    const isInvert = invertPicker.value === 'on';
+                    const filterVal = `${isGrayscale ? 'grayscale(1)' : 'grayscale(0)'} ${isInvert ? 'invert(1)' : 'invert(0)'}`;
+                    document.documentElement.style.setProperty('--hero-video-filter', filterVal);
+                    heroVideo.style.filter = filterVal;
+                    localStorage.setItem('devHeroGrayscale', grayscalePicker.value);
+                    localStorage.setItem('devHeroInvert', invertPicker.value);
+                };
+                const applyCursorEffectMode = (cursorModeValue) => {
+                    const mode = cursorEffectOptions.find((option) => option.value === cursorModeValue) || cursorEffectOptions[0];
+                    cursorEffectPicker.value = mode.value;
+                    localStorage.setItem('devCursorEffect', mode.value);
+                    if (setCursorEffectState) {
+                        setCursorEffectState(mode.value === 'on');
+                    }
+                };
+
+                const applyHeroTypography = (settings) => {
+                    const normalized = {
+                        sizeMobile: clamp(settings.sizeMobile, 6, 18),
+                        sizeDesktop: clamp(settings.sizeDesktop, 4, 14),
+                        letterSpacing: clamp(settings.letterSpacing, -0.12, 0.12),
+                        lineHeight: clamp(settings.lineHeight, 0.65, 1.3)
+                    };
+                    document.documentElement.style.setProperty('--hero-title-size-mobile', `${normalized.sizeMobile}vw`);
+                    document.documentElement.style.setProperty('--hero-title-size-desktop', `${normalized.sizeDesktop}vw`);
+                    document.documentElement.style.setProperty('--hero-title-letter-spacing', `${normalized.letterSpacing}em`);
+                    document.documentElement.style.setProperty('--hero-title-line-height', `${normalized.lineHeight}`);
+
+                    heroSizeMobile.value = normalized.sizeMobile.toFixed(1);
+                    heroSizeDesktop.value = normalized.sizeDesktop.toFixed(1);
+                    heroLetterSpacing.value = normalized.letterSpacing.toFixed(3);
+                    heroLineHeight.value = normalized.lineHeight.toFixed(2);
+                    heroSizeMobileValue.textContent = normalized.sizeMobile.toFixed(1);
+                    heroSizeDesktopValue.textContent = normalized.sizeDesktop.toFixed(1);
+                    heroLetterSpacingValue.textContent = signed(normalized.letterSpacing, 3);
+                    heroLineHeightValue.textContent = normalized.lineHeight.toFixed(2);
+
+                    localStorage.setItem('devHeroSizeMobile', String(normalized.sizeMobile));
+                    localStorage.setItem('devHeroSizeDesktop', String(normalized.sizeDesktop));
+                    localStorage.setItem('devHeroLetterSpacing', String(normalized.letterSpacing));
+                    localStorage.setItem('devHeroLineHeight', String(normalized.lineHeight));
+                };
+
+                const defaultPreset = {
+                    font: "'Verdigris MVB Pro Text', serif",
+                    weight: 700,
+                    grayscale: "on",
+                    invert: "on",
+                    cursorEffect: "on",
+                    sizeMobile: 7,
+                    sizeDesktop: 4.3,
+                    letterSpacing: 0.025,
+                    lineHeight: 0.82
+                };
+                const defaultPresetVersion = "2026-03-10";
+                if (localStorage.getItem('devHeroDefaultsVersion') !== defaultPresetVersion) {
+                    localStorage.setItem('devHeroFont', defaultPreset.font);
+                    localStorage.setItem('devHeroFontWeight', String(defaultPreset.weight));
+                    localStorage.setItem('devHeroGrayscale', defaultPreset.grayscale);
+                    localStorage.setItem('devHeroInvert', defaultPreset.invert);
+                    localStorage.setItem('devCursorEffect', defaultPreset.cursorEffect);
+                    localStorage.setItem('devHeroSizeMobile', String(defaultPreset.sizeMobile));
+                    localStorage.setItem('devHeroSizeDesktop', String(defaultPreset.sizeDesktop));
+                    localStorage.setItem('devHeroLetterSpacing', String(defaultPreset.letterSpacing));
+                    localStorage.setItem('devHeroLineHeight', String(defaultPreset.lineHeight));
+                    localStorage.setItem('devHeroDefaultsVersion', defaultPresetVersion);
+                }
+
+                const savedFont = localStorage.getItem('devHeroFont');
+                const savedWeight = localStorage.getItem('devHeroFontWeight');
+                const savedGrayscale = localStorage.getItem('devHeroGrayscale');
+                const savedInvert = localStorage.getItem('devHeroInvert');
+                const savedCursorEffect = localStorage.getItem('devCursorEffect');
+                const initialFont = serifFontOptions.some((option) => option.family === savedFont) ? savedFont : defaultPreset.font;
+                fontPicker.value = initialFont;
+                const initialFontConfig = getFontConfig(initialFont);
+                const initialWeight = refreshWeightOptions(initialFontConfig, savedWeight);
+                applyHeroFont(initialFont, initialWeight);
+                grayscalePicker.value = savedGrayscale || defaultPreset.grayscale;
+                invertPicker.value = savedInvert || defaultPreset.invert;
+                updateVideoFilters();
+                applyCursorEffectMode(savedCursorEffect || defaultPreset.cursorEffect);
+
+                applyHeroTypography({
+                    sizeMobile: getStoredNumber('devHeroSizeMobile', defaultPreset.sizeMobile),
+                    sizeDesktop: getStoredNumber('devHeroSizeDesktop', defaultPreset.sizeDesktop),
+                    letterSpacing: getStoredNumber('devHeroLetterSpacing', defaultPreset.letterSpacing),
+                    lineHeight: getStoredNumber('devHeroLineHeight', defaultPreset.lineHeight)
+                });
+
+                fontPicker.addEventListener('change', () => {
+                    const nextFontConfig = getFontConfig(fontPicker.value);
+                    const nextWeight = refreshWeightOptions(nextFontConfig, fontWeightPicker.value);
+                    applyHeroFont(fontPicker.value, nextWeight);
+                });
+                fontWeightPicker.addEventListener('change', () => {
+                    applyHeroFont(fontPicker.value, Number(fontWeightPicker.value));
+                });
+                grayscalePicker.addEventListener('change', () => {
+                    updateVideoFilters();
+                });
+                invertPicker.addEventListener('change', () => {
+                    updateVideoFilters();
+                });
+                cursorEffectPicker.addEventListener('change', () => {
+                    applyCursorEffectMode(cursorEffectPicker.value);
+                });
+
+                [heroSizeMobile, heroSizeDesktop, heroLetterSpacing, heroLineHeight].forEach((input) => {
+                    input.addEventListener('input', () => {
+                        applyHeroTypography({
+                            sizeMobile: Number(heroSizeMobile.value),
+                            sizeDesktop: Number(heroSizeDesktop.value),
+                            letterSpacing: Number(heroLetterSpacing.value),
+                            lineHeight: Number(heroLineHeight.value)
+                        });
+                    });
+                });
+
+                const cycleSelect = (selectElement, direction) => {
+                    const totalOptions = selectElement.options.length;
+                    if (!totalOptions) return;
+                    const nextIndex = (selectElement.selectedIndex + direction + totalOptions) % totalOptions;
+                    selectElement.selectedIndex = nextIndex;
+                    selectElement.dispatchEvent(new Event('change'));
+                };
+                fontPrev.addEventListener('click', () => cycleSelect(fontPicker, -1));
+                fontNext.addEventListener('click', () => cycleSelect(fontPicker, 1));
+                fontWeightPrev.addEventListener('click', () => cycleSelect(fontWeightPicker, -1));
+                fontWeightNext.addEventListener('click', () => cycleSelect(fontWeightPicker, 1));
+                grayscalePrev.addEventListener('click', () => cycleSelect(grayscalePicker, -1));
+                grayscaleNext.addEventListener('click', () => cycleSelect(grayscalePicker, 1));
+                invertPrev.addEventListener('click', () => cycleSelect(invertPicker, -1));
+                invertNext.addEventListener('click', () => cycleSelect(invertPicker, 1));
+                cursorEffectPrev.addEventListener('click', () => cycleSelect(cursorEffectPicker, -1));
+                cursorEffectNext.addEventListener('click', () => cycleSelect(cursorEffectPicker, 1));
+
+                let isDevModeVisible = false;
+                window.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
+                        e.preventDefault();
+                        isDevModeVisible = !isDevModeVisible;
+                        devModePanel.classList.toggle('hidden', !isDevModeVisible);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
