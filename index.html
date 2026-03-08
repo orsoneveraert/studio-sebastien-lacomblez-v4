@@ -23,6 +23,8 @@
             --hero-title-size-desktop: 4.3vw;
             --hero-title-line-height: 0.82;
             --hero-title-letter-spacing: 0.025em;
+            --statement-title-size-mobile: 6.02vw;
+            --statement-title-size-desktop: 3.7vw;
             --hero-video-filter: none;
             --index-column-gap: 1rem;
             --index-body-size-scale: 1;
@@ -136,9 +138,21 @@
             line-height: var(--hero-title-line-height);
             letter-spacing: var(--hero-title-letter-spacing);
             mix-blend-mode: difference;
+            transition: color 0.22s ease, text-shadow 0.22s ease, filter 0.22s ease, opacity 0.22s ease;
         }
         .hero-title-word {
             white-space: nowrap;
+        }
+        #hero-title.hero-color-difference {
+            mix-blend-mode: difference;
+        }
+        #hero-title.hero-color-luma-invert,
+        #hero-title.hero-color-spectrum-shine,
+        #hero-title.hero-color-rain-glass,
+        #hero-title.hero-color-soft-contrast,
+        #hero-title.hero-color-opal-shine,
+        #hero-title.hero-color-wet-film {
+            mix-blend-mode: normal;
         }
         .hero-effect-char {
             display: inline-block;
@@ -150,7 +164,11 @@
             text-shadow: 0 0 0.02em rgba(226, 244, 230, 0.2);
         }
         #hero-title.hero-effect-rain .hero-effect-char {
-            text-shadow: 0 0 0.018em rgba(210, 236, 255, 0.22);
+            text-shadow: 0 0 0.012em rgba(210, 236, 255, 0.18);
+        }
+        #hero-title.hero-effect-tidal .hero-effect-char,
+        #hero-title.hero-effect-mirage .hero-effect-char {
+            text-shadow: 0 0 0.01em rgba(225, 236, 244, 0.14);
         }
         @media (min-width: 768px) {
             #hero-title {
@@ -248,13 +266,13 @@
             filter: contrast(1);
         }
         .statement-title {
-            font-size: calc(var(--hero-title-size-mobile) * 0.86);
+            font-size: var(--statement-title-size-mobile);
             line-height: 0.94;
             letter-spacing: -0.02em;
         }
         @media (min-width: 768px) {
             .statement-title {
-                font-size: calc(var(--hero-title-size-desktop) * 0.86);
+                font-size: var(--statement-title-size-desktop);
             }
         }
     </style>
@@ -267,9 +285,7 @@
 
         <!-- Minimal Navigation -->
         <nav class="fixed top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-50 text-white pointer-events-none">
-            <a href="#" id="nav-brand" class="text-sm md:text-base font-semibold tracking-[0.18em] leading-none pointer-events-auto cursor-target video-aware-text">
-                Studio Sébastien Lacomblez
-            </a>
+            <a href="#" id="nav-brand" class="text-sm md:text-base font-semibold tracking-[0.18em] leading-none pointer-events-auto cursor-target video-aware-text">SL</a>
             <div class="text-sm font-medium tracking-widest uppercase flex flex-col items-end gap-1 pointer-events-auto cursor-target">
                 <a href="#work" class="hover:opacity-50 transition-opacity video-aware-text">Works</a>
                 <a href="#index" class="hover:opacity-50 transition-opacity video-aware-text">Index</a>
@@ -321,6 +337,13 @@
                         <select id="text-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="text-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                    </div>
+                    <label for="color-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Text Color FX</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="color-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="color-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="color-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
                     <label for="grayscale-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Grayscale</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
@@ -805,6 +828,9 @@
             const textEffectPrev = document.getElementById('text-effect-prev');
             const textEffectPicker = document.getElementById('text-effect-picker');
             const textEffectNext = document.getElementById('text-effect-next');
+            const colorEffectPrev = document.getElementById('color-effect-prev');
+            const colorEffectPicker = document.getElementById('color-effect-picker');
+            const colorEffectNext = document.getElementById('color-effect-next');
             const fontPickerValue = document.getElementById('font-picker-value');
             const fontPrev = document.getElementById('font-prev');
             const fontNext = document.getElementById('font-next');
@@ -883,9 +909,21 @@
             ];
             const textEffectOptions = [
                 { label: "Off", value: "off" },
-                { label: "Water Ripple", value: "ripple" },
-                { label: "Canopy Breeze", value: "breeze" },
-                { label: "Rain Drops Warp", value: "rain" }
+                { label: "Water Ripple (Subtle)", value: "ripple" },
+                { label: "Canopy Breeze (Subtle)", value: "breeze" },
+                { label: "Rain Drops Warp (Subtle)", value: "rain" },
+                { label: "Tidal Wave", value: "tidal" },
+                { label: "Forest Breath", value: "forest" },
+                { label: "Mirage Drift", value: "mirage" }
+            ];
+            const colorEffectOptions = [
+                { label: "Difference (Default)", value: "difference" },
+                { label: "Luma Invert", value: "luma-invert" },
+                { label: "Spectrum Shine", value: "spectrum-shine" },
+                { label: "Rain Glass", value: "rain-glass" },
+                { label: "Soft Contrast", value: "soft-contrast" },
+                { label: "Opal Shine", value: "opal-shine" },
+                { label: "Wet Film", value: "wet-film" }
             ];
             const indexCaseOptions = [
                 { label: "All Caps", value: "uppercase" },
@@ -906,6 +944,9 @@
                 textEffectPrev &&
                 textEffectPicker &&
                 textEffectNext &&
+                colorEffectPrev &&
+                colorEffectPicker &&
+                colorEffectNext &&
                 fontPickerValue &&
                 fontPrev &&
                 fontNext &&
@@ -974,6 +1015,12 @@
                     option.textContent = textEffectOption.label;
                     textEffectPicker.appendChild(option);
                 });
+                colorEffectOptions.forEach((colorEffectOption) => {
+                    const option = document.createElement('option');
+                    option.value = colorEffectOption.value;
+                    option.textContent = colorEffectOption.label;
+                    colorEffectPicker.appendChild(option);
+                });
                 indexCaseOptions.forEach((caseOption) => {
                     const option = document.createElement('option');
                     option.value = caseOption.value;
@@ -1037,7 +1084,14 @@
                 let ripplePulse = null;
                 const rainDrops = [];
                 let rainNextSpawnAt = 0;
-                const heroEffectClasses = ['hero-effect-ripple', 'hero-effect-breeze', 'hero-effect-rain'];
+                const heroEffectClasses = [
+                    'hero-effect-ripple',
+                    'hero-effect-breeze',
+                    'hero-effect-rain',
+                    'hero-effect-tidal',
+                    'hero-effect-forest',
+                    'hero-effect-mirage'
+                ];
                 const resetHeroTextEffects = () => {
                     heroEffectWords.forEach((word) => {
                         word.element.style.removeProperty('transform');
@@ -1096,53 +1150,55 @@
                     const source = heroEffectChars[Math.floor(Math.random() * heroEffectChars.length)];
                     if (!source) return;
                     ripplePulse = {
-                        x: source.xNorm + ((Math.random() - 0.5) * 0.08),
-                        y: source.yNorm + ((Math.random() - 0.5) * 0.1),
+                        x: source.xNorm + ((Math.random() - 0.5) * 0.06),
+                        y: source.yNorm + ((Math.random() - 0.5) * 0.08),
                         startedAt: timeSeconds,
-                        strength: 0.85 + (Math.random() * 0.5)
+                        strength: 0.55 + (Math.random() * 0.25)
                     };
                 };
                 const renderRippleEffect = (timeSeconds) => {
-                    if (!ripplePulse || timeSeconds - ripplePulse.startedAt > 2.8) {
+                    if (!ripplePulse || timeSeconds - ripplePulse.startedAt > 3.2) {
                         spawnRipplePulse(timeSeconds);
                     }
                     if (!ripplePulse) return;
                     heroEffectWords.forEach((word, wordIndex) => {
-                        const drift = Math.sin((timeSeconds * 1.05) + (wordIndex * 0.55)) * 1.4;
+                        const drift = Math.sin((timeSeconds * 0.62) + (wordIndex * 0.5)) * 0.75;
                         word.element.style.transform = `translate3d(${drift.toFixed(2)}px, 0, 0)`;
                     });
                     heroEffectChars.forEach((charMeta) => {
                         const dx = charMeta.xNorm - ripplePulse.x;
-                        const dy = (charMeta.yNorm - ripplePulse.y) * 0.9;
+                        const dy = (charMeta.yNorm - ripplePulse.y) * 0.84;
                         const distance = Math.hypot(dx, dy);
                         const elapsed = timeSeconds - ripplePulse.startedAt;
-                        const travel = elapsed * 1.35;
-                        const wave = Math.sin((travel - (distance * 2.7)) * 10.5)
-                            * Math.exp(-distance * 2.3)
-                            * Math.exp(-elapsed * 0.42)
+                        const travel = elapsed * 1.08;
+                        const wave = Math.sin((travel - (distance * 2.3)) * 7.8)
+                            * Math.exp(-distance * 3.2)
+                            * Math.exp(-elapsed * 0.6)
                             * ripplePulse.strength;
-                        const micro = Math.sin((timeSeconds * (2.2 + charMeta.randA)) + (charMeta.randB * 6.28318)) * 0.22;
-                        const tx = (dx * wave * 11) + (Math.cos((timeSeconds * 1.6) + (charMeta.randC * 6.28318)) * micro * 2.2);
-                        const ty = (wave * 9.5) + (micro * 3);
-                        const rot = (wave * 6.2) + (micro * 2.6);
-                        const opacity = 1 - Math.min(0.16, Math.abs(wave) * 0.1);
+                        const micro = Math.sin((timeSeconds * (1.5 + (charMeta.randA * 0.5))) + (charMeta.randB * 6.28318)) * 0.08;
+                        const tx = (dx * wave * 4.2) + (Math.cos((timeSeconds * 1.05) + (charMeta.randC * 6.28318)) * micro * 0.8);
+                        const ty = (wave * 3.1) + (micro * 0.7);
+                        const rot = (wave * 1.5) + (micro * 0.35);
+                        const opacity = 1 - Math.min(0.08, Math.abs(wave) * 0.06);
                         charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg)`;
+                        charMeta.element.style.filter = '';
                         charMeta.element.style.opacity = opacity.toFixed(3);
                     });
                 };
                 const renderBreezeEffect = (timeSeconds) => {
                     heroEffectWords.forEach((word, wordIndex) => {
-                        const sway = Math.sin((timeSeconds * 0.74) + (wordIndex * 0.92)) * 2.7;
-                        const lift = Math.cos((timeSeconds * 0.53) + (wordIndex * 0.71)) * 1.2;
+                        const sway = Math.sin((timeSeconds * 0.44) + (wordIndex * 0.85)) * 1.2;
+                        const lift = Math.cos((timeSeconds * 0.31) + (wordIndex * 0.66)) * 0.6;
                         word.element.style.transform = `translate3d(${sway.toFixed(2)}px, ${lift.toFixed(2)}px, 0)`;
                     });
                     heroEffectChars.forEach((charMeta) => {
-                        const phase = (timeSeconds * 1.3) + (charMeta.charIndex * 0.46) + (charMeta.wordIndex * 0.83) + (charMeta.randA * 5.4);
-                        const tx = (Math.sin(phase) * 2.1) + (Math.cos((timeSeconds * 0.7) + (charMeta.randB * 5.8)) * 0.8);
-                        const ty = (Math.cos(phase * 0.9) * 1.8) + (Math.sin((timeSeconds * 0.84) + (charMeta.randC * 6.2)) * 0.7);
-                        const rot = Math.sin(phase * 0.82) * 2.9;
-                        const scaleY = 1 + (Math.cos(phase * 0.68) * 0.025);
+                        const phase = (timeSeconds * 0.86) + (charMeta.charIndex * 0.38) + (charMeta.wordIndex * 0.72) + (charMeta.randA * 4.7);
+                        const tx = (Math.sin(phase) * 0.95) + (Math.cos((timeSeconds * 0.42) + (charMeta.randB * 5.8)) * 0.35);
+                        const ty = (Math.cos(phase * 0.9) * 0.9) + (Math.sin((timeSeconds * 0.52) + (charMeta.randC * 6.2)) * 0.25);
+                        const rot = Math.sin(phase * 0.72) * 1.15;
+                        const scaleY = 1 + (Math.cos(phase * 0.61) * 0.012);
                         charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scaleY(${scaleY.toFixed(3)})`;
+                        charMeta.element.style.filter = '';
                         charMeta.element.style.opacity = '1';
                     });
                 };
@@ -1152,14 +1208,14 @@
                         x: Math.random(),
                         y: Math.random(),
                         startedAt: timeSeconds,
-                        force: 0.7 + (Math.random() * 0.7)
+                        force: 0.34 + (Math.random() * 0.34)
                     });
-                    rainNextSpawnAt = timeSeconds + 0.2 + (Math.random() * 0.45);
+                    rainNextSpawnAt = timeSeconds + 0.42 + (Math.random() * 0.7);
                 };
                 const renderRainEffect = (timeSeconds) => {
                     maybeSpawnRainDrop(timeSeconds);
                     for (let i = rainDrops.length - 1; i >= 0; i -= 1) {
-                        if (timeSeconds - rainDrops[i].startedAt > 2.1) {
+                        if (timeSeconds - rainDrops[i].startedAt > 2.4) {
                             rainDrops.splice(i, 1);
                         }
                     }
@@ -1174,20 +1230,73 @@
                         rainDrops.forEach((drop) => {
                             const age = timeSeconds - drop.startedAt;
                             if (age < 0) return;
-                            const radius = age * 0.55;
+                            const radius = age * 0.45;
                             const dx = charMeta.xNorm - drop.x;
-                            const dy = (charMeta.yNorm - drop.y) * 1.45;
+                            const dy = (charMeta.yNorm - drop.y) * 1.18;
                             const dist = Math.hypot(dx, dy) + 0.0001;
-                            const ring = Math.exp(-Math.pow((dist - radius) * 10.5, 2)) * Math.exp(-age * 0.45);
-                            const impact = Math.exp(-Math.pow(dist * 14, 2)) * Math.exp(-age * 4.8);
-                            tx += (dx / dist) * ring * drop.force * 10.5;
-                            ty += (dy / dist) * ring * drop.force * 6.8 - (impact * drop.force * 8.2);
-                            rot += dx * ring * drop.force * 28;
-                            shimmer += (ring * 0.65) + (impact * 0.5);
+                            const ring = Math.exp(-Math.pow((dist - radius) * 9.4, 2)) * Math.exp(-age * 0.6);
+                            const impact = Math.exp(-Math.pow(dist * 12, 2)) * Math.exp(-age * 5.3);
+                            tx += (dx / dist) * ring * drop.force * 4.6;
+                            ty += (dy / dist) * ring * drop.force * 3.1 - (impact * drop.force * 2.8);
+                            rot += dx * ring * drop.force * 7.5;
+                            shimmer += (ring * 0.38) + (impact * 0.32);
                         });
-                        const scaleY = 1 + Math.min(0.08, shimmer * 0.05);
-                        const opacity = 1 - Math.min(0.18, shimmer * 0.1);
+                        const scaleY = 1 + Math.min(0.03, shimmer * 0.02);
+                        const opacity = 1 - Math.min(0.1, shimmer * 0.06);
                         charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scaleY(${scaleY.toFixed(3)})`;
+                        charMeta.element.style.filter = '';
+                        charMeta.element.style.opacity = opacity.toFixed(3);
+                    });
+                };
+                const renderTidalEffect = (timeSeconds) => {
+                    heroEffectWords.forEach((word, wordIndex) => {
+                        const driftX = Math.sin((timeSeconds * 0.32) + (wordIndex * 0.8)) * 0.45;
+                        const driftY = Math.cos((timeSeconds * 0.27) + (wordIndex * 0.9)) * 0.25;
+                        word.element.style.transform = `translate3d(${driftX.toFixed(2)}px, ${driftY.toFixed(2)}px, 0)`;
+                    });
+                    heroEffectChars.forEach((charMeta) => {
+                        const phaseA = (timeSeconds * 0.58) + (charMeta.xNorm * 6.2) + (charMeta.yNorm * 1.2);
+                        const phaseB = (timeSeconds * 0.31) - (charMeta.xNorm * 8.4) + (charMeta.randA * 5.6);
+                        const envelope = 0.55 + (Math.sin((timeSeconds * 0.16) + (charMeta.randB * 6.28318)) * 0.35);
+                        const waveY = (Math.sin(phaseA) + (Math.sin(phaseB) * 0.45)) * envelope * 1.45;
+                        const waveX = (Math.cos(phaseA * 0.82) * envelope * 0.65);
+                        const rot = Math.sin((phaseA * 0.75) + phaseB) * 0.65;
+                        const scaleY = 1 + (Math.sin(phaseB) * 0.01);
+                        charMeta.element.style.transform = `translate3d(${waveX.toFixed(2)}px, ${waveY.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scaleY(${scaleY.toFixed(3)})`;
+                        charMeta.element.style.filter = '';
+                        charMeta.element.style.opacity = '1';
+                    });
+                };
+                const renderForestEffect = (timeSeconds) => {
+                    heroEffectWords.forEach((word, wordIndex) => {
+                        const sway = Math.sin((timeSeconds * 0.22) + (wordIndex * 0.78)) * 0.35;
+                        word.element.style.transform = `translate3d(${sway.toFixed(2)}px, 0, 0)`;
+                    });
+                    heroEffectChars.forEach((charMeta) => {
+                        const gust = (Math.sin((timeSeconds * 0.2) + (charMeta.randA * 5.9)) * 0.55)
+                            + (Math.sin((timeSeconds * 0.09) + (charMeta.randB * 6.28318)) * 0.45);
+                        const phase = (timeSeconds * 0.66) + (charMeta.charIndex * 0.35) + (charMeta.yNorm * 0.95);
+                        const tx = (Math.sin(phase) * gust * 0.92) + (Math.cos((timeSeconds * 0.4) + (charMeta.xNorm * 3.4)) * 0.2);
+                        const ty = Math.cos((phase * 1.12) + (charMeta.randC * 5.7)) * gust * 0.42;
+                        const rot = Math.sin((phase * 0.8) + charMeta.randB) * gust * 0.85;
+                        charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg)`;
+                        charMeta.element.style.filter = '';
+                        charMeta.element.style.opacity = (0.97 + (Math.abs(gust) * 0.02)).toFixed(3);
+                    });
+                };
+                const renderMirageEffect = (timeSeconds) => {
+                    heroEffectWords.forEach((word) => {
+                        word.element.style.transform = '';
+                    });
+                    heroEffectChars.forEach((charMeta) => {
+                        const lane = Math.sin((timeSeconds * 0.95) + (charMeta.yNorm * 9.4) + (charMeta.randA * 6.1));
+                        const micro = Math.sin((timeSeconds * 2.4) + (charMeta.xNorm * 18) + (charMeta.randB * 6.28318)) * 0.2;
+                        const tx = (lane * 0.42) + micro;
+                        const ty = Math.sin((timeSeconds * 0.7) + (charMeta.xNorm * 4.8) + (charMeta.randC * 6.28318)) * 0.18;
+                        const blur = 0.03 + (Math.abs(lane) * 0.16);
+                        const opacity = 0.92 + (Math.abs(Math.cos((timeSeconds * 1.3) + (charMeta.randB * 6.28318))) * 0.08);
+                        charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0)`;
+                        charMeta.element.style.filter = `blur(${blur.toFixed(2)}px)`;
                         charMeta.element.style.opacity = opacity.toFixed(3);
                     });
                 };
@@ -1203,6 +1312,12 @@
                         renderBreezeEffect(timeSeconds);
                     } else if (heroEffectMode === 'rain') {
                         renderRainEffect(timeSeconds);
+                    } else if (heroEffectMode === 'tidal') {
+                        renderTidalEffect(timeSeconds);
+                    } else if (heroEffectMode === 'forest') {
+                        renderForestEffect(timeSeconds);
+                    } else if (heroEffectMode === 'mirage') {
+                        renderMirageEffect(timeSeconds);
                     }
                     heroEffectFrameId = requestAnimationFrame(runHeroTextEffectFrame);
                 };
@@ -1225,6 +1340,254 @@
                     startHeroTextEffectLoop();
                 };
                 prepareHeroTextEffectCharacters();
+                const heroColorModeClasses = [
+                    'hero-color-difference',
+                    'hero-color-luma-invert',
+                    'hero-color-spectrum-shine',
+                    'hero-color-rain-glass',
+                    'hero-color-soft-contrast',
+                    'hero-color-opal-shine',
+                    'hero-color-wet-film'
+                ];
+                let heroColorEffectMode = 'difference';
+                let heroColorFrameId = null;
+                let heroColorLastSampleAt = 0;
+                const heroColorSample = {
+                    r: 128,
+                    g: 128,
+                    b: 128,
+                    luma: 0.5,
+                    var: 0.2,
+                    hue: 210
+                };
+                const heroColorCanvas = document.createElement('canvas');
+                heroColorCanvas.width = 30;
+                heroColorCanvas.height = 20;
+                const heroColorCtx = heroColorCanvas.getContext('2d', { willReadFrequently: true });
+                const clearHeroColorStyles = () => {
+                    heroTitle.style.removeProperty('color');
+                    heroTitle.style.removeProperty('text-shadow');
+                    heroTitle.style.removeProperty('filter');
+                    heroTitle.style.removeProperty('opacity');
+                    heroTitle.style.removeProperty('transform');
+                    heroTitle.style.removeProperty('mix-blend-mode');
+                };
+                const rgbToHue = (r, g, b) => {
+                    const rn = r / 255;
+                    const gn = g / 255;
+                    const bn = b / 255;
+                    const max = Math.max(rn, gn, bn);
+                    const min = Math.min(rn, gn, bn);
+                    const delta = max - min;
+                    if (delta === 0) return 0;
+                    let hue;
+                    if (max === rn) {
+                        hue = ((gn - bn) / delta) % 6;
+                    } else if (max === gn) {
+                        hue = ((bn - rn) / delta) + 2;
+                    } else {
+                        hue = ((rn - gn) / delta) + 4;
+                    }
+                    return (hue * 60 + 360) % 360;
+                };
+                const sampleHeroVideoTone = () => {
+                    if (!heroColorCtx || !heroVideo || heroVideo.readyState < 2 || !heroVideo.videoWidth || !heroVideo.videoHeight) {
+                        return;
+                    }
+                    const videoRect = heroVideo.getBoundingClientRect();
+                    const titleRect = heroTitle.getBoundingClientRect();
+                    if (videoRect.width <= 0 || videoRect.height <= 0) return;
+
+                    let sampleLeft = Math.max(videoRect.left, titleRect.left);
+                    let sampleTop = Math.max(videoRect.top, titleRect.top);
+                    let sampleRight = Math.min(videoRect.right, titleRect.right);
+                    let sampleBottom = Math.min(videoRect.bottom, titleRect.bottom);
+                    if ((sampleRight - sampleLeft) < 8 || (sampleBottom - sampleTop) < 8) {
+                        sampleLeft = videoRect.left + (videoRect.width * 0.2);
+                        sampleTop = videoRect.top + (videoRect.height * 0.15);
+                        sampleRight = videoRect.right - (videoRect.width * 0.2);
+                        sampleBottom = videoRect.bottom - (videoRect.height * 0.15);
+                    }
+
+                    const normalizedLeft = (sampleLeft - videoRect.left) / videoRect.width;
+                    const normalizedTop = (sampleTop - videoRect.top) / videoRect.height;
+                    const normalizedWidth = (sampleRight - sampleLeft) / videoRect.width;
+                    const normalizedHeight = (sampleBottom - sampleTop) / videoRect.height;
+                    const sx = clamp(normalizedLeft * heroVideo.videoWidth, 0, heroVideo.videoWidth - 1);
+                    const sy = clamp(normalizedTop * heroVideo.videoHeight, 0, heroVideo.videoHeight - 1);
+                    const sw = clamp(normalizedWidth * heroVideo.videoWidth, 1, heroVideo.videoWidth - sx);
+                    const sh = clamp(normalizedHeight * heroVideo.videoHeight, 1, heroVideo.videoHeight - sy);
+
+                    heroColorCtx.drawImage(heroVideo, sx, sy, sw, sh, 0, 0, heroColorCanvas.width, heroColorCanvas.height);
+                    const pixels = heroColorCtx.getImageData(0, 0, heroColorCanvas.width, heroColorCanvas.height).data;
+                    let rSum = 0;
+                    let gSum = 0;
+                    let bSum = 0;
+                    let lumaSum = 0;
+                    let lumaSquaredSum = 0;
+                    let pixelCount = 0;
+
+                    for (let i = 0; i < pixels.length; i += 4) {
+                        const alpha = pixels[i + 3];
+                        if (alpha < 12) continue;
+                        const r = pixels[i];
+                        const g = pixels[i + 1];
+                        const b = pixels[i + 2];
+                        const luma = ((0.2126 * r) + (0.7152 * g) + (0.0722 * b)) / 255;
+                        rSum += r;
+                        gSum += g;
+                        bSum += b;
+                        lumaSum += luma;
+                        lumaSquaredSum += (luma * luma);
+                        pixelCount += 1;
+                    }
+                    if (!pixelCount) return;
+
+                    const avgR = rSum / pixelCount;
+                    const avgG = gSum / pixelCount;
+                    const avgB = bSum / pixelCount;
+                    const avgLuma = lumaSum / pixelCount;
+                    const lumaVariance = Math.max(0, (lumaSquaredSum / pixelCount) - (avgLuma * avgLuma));
+                    heroColorSample.r = avgR;
+                    heroColorSample.g = avgG;
+                    heroColorSample.b = avgB;
+                    heroColorSample.luma = avgLuma;
+                    heroColorSample.var = Math.sqrt(lumaVariance);
+                    heroColorSample.hue = rgbToHue(avgR, avgG, avgB);
+                };
+                const renderHeroColorStyles = (timeSeconds) => {
+                    const sample = heroColorSample;
+                    if (heroColorEffectMode === 'luma-invert') {
+                        const onLight = sample.luma > 0.54;
+                        const base = onLight ? 20 : 240;
+                        const tintDelta = 0.09;
+                        const r = clamp(Math.round(base + ((sample.r - 128) * tintDelta)), 0, 255);
+                        const g = clamp(Math.round(base + ((sample.g - 128) * tintDelta)), 0, 255);
+                        const b = clamp(Math.round(base + ((sample.b - 128) * tintDelta)), 0, 255);
+                        const alpha = 0.93 + Math.min(0.05, sample.var * 0.24);
+                        const glow = 5 + (sample.var * 11);
+                        heroTitle.style.color = `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)})`;
+                        heroTitle.style.textShadow = onLight
+                            ? `0 0 ${glow.toFixed(1)}px rgba(255,255,255,0.14)`
+                            : `0 0 ${glow.toFixed(1)}px rgba(0,0,0,0.14)`;
+                        heroTitle.style.filter = `contrast(${(1.03 + sample.var * 0.25).toFixed(2)})`;
+                        heroTitle.style.opacity = '1';
+                        heroTitle.style.transform = 'none';
+                        return;
+                    }
+                    if (heroColorEffectMode === 'spectrum-shine') {
+                        const hue = (sample.hue + (Math.sin(timeSeconds * 0.56) * 12) + 360) % 360;
+                        const saturation = Math.min(80, 52 + (sample.var * 78));
+                        const lightness = clamp(70 - (sample.luma * 12) + (Math.sin(timeSeconds * 1.4) * 2.2), 40, 84);
+                        const glowA = 6 + (sample.var * 14);
+                        const glowB = 11 + (sample.var * 19);
+                        const shimmer = 0.95 + (Math.sin(timeSeconds * 1.05 + (sample.hue * 0.01)) * 0.03);
+                        heroTitle.style.color = `hsl(${hue.toFixed(1)} ${saturation.toFixed(1)}% ${lightness.toFixed(1)}%)`;
+                        heroTitle.style.textShadow = `0 0 ${glowA.toFixed(1)}px hsla(${(hue + 24) % 360} 90% 84% / 0.24), 0 0 ${glowB.toFixed(1)}px hsla(${(hue + 136) % 360} 80% 62% / 0.14)`;
+                        heroTitle.style.filter = `saturate(${(1.08 + sample.var * 0.62).toFixed(2)}) blur(${(0.04 + sample.var * 0.2).toFixed(2)}px)`;
+                        heroTitle.style.opacity = shimmer.toFixed(3);
+                        heroTitle.style.transform = 'none';
+                        return;
+                    }
+                    if (heroColorEffectMode === 'rain-glass') {
+                        const dropPulse = Math.abs(Math.sin((timeSeconds * 2.15) + (sample.hue * 0.02)));
+                        const blur = 0.14 + (sample.var * 0.72) + (dropPulse * 0.34);
+                        const skew = Math.sin((timeSeconds * 0.92) + (sample.luma * 3.2)) * 0.34;
+                        const opacity = clamp(0.84 + ((1 - sample.luma) * 0.08) + (dropPulse * 0.045), 0.78, 0.97);
+                        const r = clamp(Math.round(218 + (sample.r * 0.05)), 0, 255);
+                        const g = clamp(Math.round(230 + (sample.g * 0.03)), 0, 255);
+                        const b = clamp(Math.round(238 + (sample.b * 0.025)), 0, 255);
+                        heroTitle.style.color = `rgba(${r}, ${g}, ${b}, 0.92)`;
+                        heroTitle.style.textShadow = `0 0 ${(5 + sample.var * 12).toFixed(1)}px rgba(210,240,255,0.24), 0 0 ${(10 + dropPulse * 11).toFixed(1)}px rgba(157,206,255,0.16)`;
+                        heroTitle.style.filter = `blur(${blur.toFixed(2)}px) contrast(${(1.04 + sample.var * 0.23).toFixed(2)})`;
+                        heroTitle.style.opacity = opacity.toFixed(3);
+                        heroTitle.style.transform = `skewX(${skew.toFixed(2)}deg)`;
+                        return;
+                    }
+                    if (heroColorEffectMode === 'soft-contrast') {
+                        const onLight = sample.luma > 0.5;
+                        const base = onLight ? 36 : 232;
+                        const tintDelta = 0.07 + (sample.var * 0.1);
+                        const r = clamp(Math.round(base + ((sample.r - 128) * tintDelta)), 0, 255);
+                        const g = clamp(Math.round(base + ((sample.g - 128) * tintDelta)), 0, 255);
+                        const b = clamp(Math.round(base + ((sample.b - 128) * tintDelta)), 0, 255);
+                        heroTitle.style.color = `rgba(${r}, ${g}, ${b}, 0.95)`;
+                        heroTitle.style.textShadow = onLight
+                            ? '0 0 4px rgba(255,255,255,0.1)'
+                            : '0 0 4px rgba(0,0,0,0.1)';
+                        heroTitle.style.filter = `contrast(${(1.02 + sample.var * 0.22).toFixed(2)})`;
+                        heroTitle.style.opacity = '1';
+                        heroTitle.style.transform = 'none';
+                        return;
+                    }
+                    if (heroColorEffectMode === 'opal-shine') {
+                        const hue = (sample.hue + (Math.sin(timeSeconds * 0.44) * 10) + 360) % 360;
+                        const sat = clamp(32 + (sample.var * 54), 24, 70);
+                        const light = clamp(76 - (sample.luma * 14) + (Math.sin(timeSeconds * 1.2) * 2), 44, 88);
+                        const shine = 0.18 + (Math.abs(Math.sin((timeSeconds * 1.14) + (sample.hue * 0.01))) * 0.2);
+                        heroTitle.style.color = `hsl(${hue.toFixed(1)} ${sat.toFixed(1)}% ${light.toFixed(1)}%)`;
+                        heroTitle.style.textShadow = `0 0 ${(5 + sample.var * 10).toFixed(1)}px hsla(${(hue + 18) % 360} 88% 90% / ${(0.14 + shine).toFixed(3)}), 0 0 ${(9 + sample.var * 12).toFixed(1)}px hsla(${(hue + 170) % 360} 72% 68% / 0.1)`;
+                        heroTitle.style.filter = `saturate(${(1.04 + sample.var * 0.42).toFixed(2)})`;
+                        heroTitle.style.opacity = (0.94 + (shine * 0.08)).toFixed(3);
+                        heroTitle.style.transform = 'none';
+                        return;
+                    }
+                    if (heroColorEffectMode === 'wet-film') {
+                        const pulse = Math.sin((timeSeconds * 1.5) + (sample.hue * 0.02));
+                        const blur = 0.12 + (sample.var * 0.56) + (Math.abs(pulse) * 0.2);
+                        const skew = Math.sin((timeSeconds * 0.8) + (sample.luma * 4.3)) * 0.28;
+                        const colorBias = sample.luma > 0.52 ? 34 : 226;
+                        const r = clamp(Math.round(colorBias + ((sample.r - 128) * 0.06)), 0, 255);
+                        const g = clamp(Math.round(colorBias + ((sample.g - 128) * 0.08)), 0, 255);
+                        const b = clamp(Math.round(colorBias + ((sample.b - 128) * 0.11)), 0, 255);
+                        const opacity = clamp(0.84 + ((1 - sample.luma) * 0.08) + (Math.abs(pulse) * 0.04), 0.8, 0.95);
+                        heroTitle.style.color = `rgba(${r}, ${g}, ${b}, 0.94)`;
+                        heroTitle.style.textShadow = `0 0 ${(4 + sample.var * 9).toFixed(1)}px rgba(190,210,238,0.18)`;
+                        heroTitle.style.filter = `blur(${blur.toFixed(2)}px) contrast(${(1.03 + sample.var * 0.2).toFixed(2)})`;
+                        heroTitle.style.opacity = opacity.toFixed(3);
+                        heroTitle.style.transform = `skewX(${skew.toFixed(2)}deg)`;
+                    }
+                };
+                const runHeroColorEffectFrame = (timestamp) => {
+                    if (heroColorEffectMode === 'difference') {
+                        heroColorFrameId = null;
+                        return;
+                    }
+                    if ((timestamp - heroColorLastSampleAt) > 55) {
+                        sampleHeroVideoTone();
+                        heroColorLastSampleAt = timestamp;
+                    }
+                    renderHeroColorStyles(timestamp / 1000);
+                    heroColorFrameId = requestAnimationFrame(runHeroColorEffectFrame);
+                };
+                const startHeroColorEffectLoop = () => {
+                    if (heroColorFrameId !== null) return;
+                    heroColorFrameId = requestAnimationFrame(runHeroColorEffectFrame);
+                };
+                const stopHeroColorEffectLoop = () => {
+                    if (heroColorFrameId !== null) {
+                        cancelAnimationFrame(heroColorFrameId);
+                        heroColorFrameId = null;
+                    }
+                };
+                const applyHeroColorEffect = (effectValue) => {
+                    const matched = colorEffectOptions.find((effectOption) => effectOption.value === effectValue) || colorEffectOptions[0];
+                    heroColorEffectMode = matched.value;
+                    colorEffectPicker.value = matched.value;
+                    localStorage.setItem('devHeroColorEffect', matched.value);
+                    heroTitle.classList.remove(...heroColorModeClasses);
+                    heroTitle.classList.add(`hero-color-${matched.value}`);
+                    if (matched.value === 'difference') {
+                        stopHeroColorEffectLoop();
+                        clearHeroColorStyles();
+                        return;
+                    }
+                    heroTitle.style.mixBlendMode = 'normal';
+                    heroColorLastSampleAt = 0;
+                    sampleHeroVideoTone();
+                    renderHeroColorStyles(performance.now() / 1000);
+                    startHeroColorEffectLoop();
+                };
 
                 const refreshWeightOptions = (fontConfig, preferredWeight) => {
                     fontWeightPicker.innerHTML = '';
@@ -1397,25 +1760,31 @@
                 };
 
                 const defaultPreset = {
-                    font: "'Verdigris MVB Pro Text', serif",
-                    weight: 700,
+                    font: "'Thermal VF Thin Text', serif",
+                    weight: 200,
+                    variableAxisOpsz: 770,
+                    textEffect: "mirage",
+                    colorEffect: "rain-glass",
                     grayscale: "off",
                     invert: "off",
                     cursorEffect: "on",
                     sizeMobile: 7,
-                    sizeDesktop: 4.3,
-                    letterSpacing: 0.025,
-                    lineHeight: 0.82
+                    sizeDesktop: 8.9,
+                    letterSpacing: 0.01,
+                    lineHeight: 0.79
                 };
                 const indexDefaultPreset = {
                     case: "normalcaps",
                     columnGap: 3.2,
                     bodyScale: 0.75
                 };
-                const defaultPresetVersion = "2026-03-11";
+                const defaultPresetVersion = "2026-03-12";
                 if (localStorage.getItem('devHeroDefaultsVersion') !== defaultPresetVersion) {
                     localStorage.setItem('devHeroFont', defaultPreset.font);
                     localStorage.setItem('devHeroFontWeight', String(defaultPreset.weight));
+                    localStorage.setItem('devHeroVariableAxis-thermal-vf-thin-text-opsz', String(defaultPreset.variableAxisOpsz));
+                    localStorage.setItem('devHeroTextEffect', defaultPreset.textEffect);
+                    localStorage.setItem('devHeroColorEffect', defaultPreset.colorEffect);
                     localStorage.setItem('devHeroGrayscale', defaultPreset.grayscale);
                     localStorage.setItem('devHeroInvert', defaultPreset.invert);
                     localStorage.setItem('devCursorEffect', defaultPreset.cursorEffect);
@@ -1433,7 +1802,10 @@
                     localStorage.setItem('devIndexDefaultsVersion', indexDefaultPresetVersion);
                 }
                 if (!localStorage.getItem('devHeroTextEffect')) {
-                    localStorage.setItem('devHeroTextEffect', 'off');
+                    localStorage.setItem('devHeroTextEffect', defaultPreset.textEffect);
+                }
+                if (!localStorage.getItem('devHeroColorEffect')) {
+                    localStorage.setItem('devHeroColorEffect', defaultPreset.colorEffect);
                 }
 
                 const savedFont = localStorage.getItem('devHeroFont');
@@ -1442,13 +1814,15 @@
                 const savedInvert = localStorage.getItem('devHeroInvert');
                 const savedCursorEffect = localStorage.getItem('devCursorEffect');
                 const savedTextEffect = localStorage.getItem('devHeroTextEffect');
+                const savedColorEffect = localStorage.getItem('devHeroColorEffect');
                 const savedIndexCase = localStorage.getItem('devIndexCase');
                 const initialFont = serifFontOptions.some((option) => option.family === savedFont) ? savedFont : defaultPreset.font;
                 fontPicker.value = initialFont;
                 const initialFontConfig = getFontConfig(initialFont);
                 const initialWeight = refreshWeightOptions(initialFontConfig, savedWeight);
                 applyHeroFont(initialFont, initialWeight);
-                applyHeroTextEffect(savedTextEffect || 'off');
+                applyHeroTextEffect(savedTextEffect || defaultPreset.textEffect);
+                applyHeroColorEffect(savedColorEffect || defaultPreset.colorEffect);
                 grayscalePicker.value = savedGrayscale || defaultPreset.grayscale;
                 invertPicker.value = savedInvert || defaultPreset.invert;
                 updateVideoFilters();
@@ -1482,6 +1856,9 @@
                 });
                 textEffectPicker.addEventListener('change', () => {
                     applyHeroTextEffect(textEffectPicker.value);
+                });
+                colorEffectPicker.addEventListener('change', () => {
+                    applyHeroColorEffect(colorEffectPicker.value);
                 });
                 grayscalePicker.addEventListener('change', () => {
                     updateVideoFilters();
@@ -1532,6 +1909,8 @@
                 fontWeightNext.addEventListener('click', () => cycleSelect(fontWeightPicker, 1));
                 textEffectPrev.addEventListener('click', () => cycleSelect(textEffectPicker, -1));
                 textEffectNext.addEventListener('click', () => cycleSelect(textEffectPicker, 1));
+                colorEffectPrev.addEventListener('click', () => cycleSelect(colorEffectPicker, -1));
+                colorEffectNext.addEventListener('click', () => cycleSelect(colorEffectPicker, 1));
                 grayscalePrev.addEventListener('click', () => cycleSelect(grayscalePicker, -1));
                 grayscaleNext.addEventListener('click', () => cycleSelect(grayscalePicker, 1));
                 invertPrev.addEventListener('click', () => cycleSelect(invertPicker, -1));
@@ -1547,10 +1926,14 @@
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
                         stopHeroTextEffectLoop();
+                        stopHeroColorEffectLoop();
                         return;
                     }
                     if (heroEffectMode !== 'off') {
                         startHeroTextEffectLoop();
+                    }
+                    if (heroColorEffectMode !== 'difference') {
+                        startHeroColorEffectLoop();
                     }
                 });
                 document.addEventListener('click', (event) => {
