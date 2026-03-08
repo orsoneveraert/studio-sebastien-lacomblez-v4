@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kinetic Brutalism Studio</title>
+    <link rel="icon" type="image/png" href="./assets/favicon-sl.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,6 +24,8 @@
             --hero-title-line-height: 0.82;
             --hero-title-letter-spacing: 0.025em;
             --hero-video-filter: none;
+            --index-column-gap: 1rem;
+            --index-body-size-scale: 1;
         }
         @font-face {
             font-family: 'SangBleu Kingdom';
@@ -159,6 +162,24 @@
         
         /* Brutalist Index Grid */
         .index-row-container:hover .index-text { color: #888; }
+        .index-dev-grid {
+            gap: var(--index-column-gap);
+        }
+        .index-body-row {
+            font-size: calc(1.25rem * var(--index-body-size-scale));
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+        @media (min-width: 768px) {
+            .index-body-row {
+                font-size: clamp(1.8rem, calc(2.5vw * var(--index-body-size-scale)), 4rem);
+            }
+        }
+        body.index-case-normalcaps .index-body-row {
+            text-transform: none;
+            font-variant-caps: normal;
+            letter-spacing: 0.005em;
+        }
         .font-display {
             font-family: var(--font-sans);
             font-weight: 600;
@@ -166,9 +187,39 @@
             line-height: 0.9;
             letter-spacing: -0.01em;
         }
+        #dev-text-inspector {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 80;
+            pointer-events: none;
+            max-width: min(92vw, 520px);
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 6px;
+            background: rgba(8, 8, 10, 0.86);
+            color: #f6f6f6;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            line-height: 1.35;
+            letter-spacing: 0.04em;
+            text-transform: none;
+            white-space: pre-line;
+            opacity: 0;
+            transition: opacity 0.12s ease;
+            backdrop-filter: blur(6px);
+        }
+        #dev-text-inspector.visible {
+            opacity: 1;
+        }
         .work-card img {
             filter: contrast(1.1);
             transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
+        }
+        .work-card-label {
+            display: inline-block;
+            color: inherit;
+            text-decoration: none;
         }
         .work-card:hover img {
             transform: scale(1.05);
@@ -187,14 +238,15 @@
     </style>
 </head>
 <body>
-    <div class="min-h-screen bg-white text-black font-sans relative w-full overflow-hidden">
-        <!-- Custom Cursor -->
-        <div id="cursor"></div>
+        <div class="min-h-screen bg-white text-black font-sans relative w-full overflow-hidden">
+            <!-- Custom Cursor -->
+            <div id="cursor"></div>
+            <div id="dev-text-inspector" aria-hidden="true"></div>
 
         <!-- Minimal Navigation -->
         <nav class="fixed top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-50 text-white pointer-events-none">
             <a href="#" id="nav-brand" class="text-sm md:text-base font-semibold tracking-[0.18em] leading-none pointer-events-auto cursor-target video-aware-text" style="font-variant-caps: all-small-caps;">
-                sl
+                SL
             </a>
             <div class="text-sm font-medium tracking-widest uppercase flex flex-col items-end gap-1 pointer-events-auto cursor-target">
                 <a href="#work" class="hover:opacity-50 transition-opacity video-aware-text">Works</a>
@@ -212,69 +264,91 @@
             </div>
             <div class="relative z-10 w-full text-white">
                 <h1 id="hero-title" class="font-serif flex flex-col items-center text-center">
-                    <span class="block overflow-hidden"><span class="block hero-title-word">studio</span></span>
-                    <span class="block overflow-hidden"><span class="block hero-title-word">sébastien</span></span>
-                    <span class="block overflow-hidden"><span class="block hero-title-word">lacomblez</span></span>
+                    <span class="block hero-title-word">studio</span>
+                    <span class="block hero-title-word">sébastien</span>
+                    <span class="block hero-title-word">lacomblez</span>
                 </h1>
             </div>
-            <div id="dev-mode-panel" class="hidden absolute top-4 left-4 md:top-6 md:left-6 z-30 w-[min(92vw,380px)] bg-black/70 text-white border border-white/40 rounded-md p-3 md:p-4 backdrop-blur-sm">
+            <div id="dev-mode-panel" class="hidden fixed top-4 left-4 md:top-6 md:left-6 z-[60] w-[min(92vw,380px)] bg-black/70 text-white border border-white/40 rounded-md p-3 md:p-4 backdrop-blur-sm">
                 <p class="text-[10px] tracking-[0.22em] uppercase text-white/75 mb-2">Dev Mode</p>
-                <label for="font-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Hero Font</label>
-                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
-                    <button id="font-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
-                    <select id="font-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
-                    </select>
-                    <button id="font-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                <div id="dev-hero-controls">
+                    <label for="font-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Hero Font</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="font-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="font-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="font-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                    </div>
+                    <label for="font-weight-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Weight</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="font-weight-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="font-weight-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="font-weight-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                    </div>
+                    <label for="grayscale-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Grayscale</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="grayscale-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="grayscale-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="grayscale-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                    </div>
+                    <label for="invert-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Invert</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="invert-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="invert-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="invert-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                    </div>
+                    <label for="cursor-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Mouse Effect</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="cursor-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="cursor-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="cursor-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                    </div>
+                    <label for="hero-size-mobile" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Mobile (vw)</label>
+                    <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                        <input id="hero-size-mobile" type="range" min="6" max="18" step="0.1" class="w-full accent-white">
+                        <span id="hero-size-mobile-value" class="text-[11px] text-right text-white/80 tabular-nums">7.0</span>
+                    </div>
+                    <label for="hero-size-desktop" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Desktop (vw)</label>
+                    <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                        <input id="hero-size-desktop" type="range" min="4" max="14" step="0.1" class="w-full accent-white">
+                        <span id="hero-size-desktop-value" class="text-[11px] text-right text-white/80 tabular-nums">4.3</span>
+                    </div>
+                    <label for="hero-letter-spacing" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Letter Spacing (em)</label>
+                    <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                        <input id="hero-letter-spacing" type="range" min="-0.12" max="0.12" step="0.005" class="w-full accent-white">
+                        <span id="hero-letter-spacing-value" class="text-[11px] text-right text-white/80 tabular-nums">+0.025</span>
+                    </div>
+                    <label for="hero-line-height" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Line Height</label>
+                    <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                        <input id="hero-line-height" type="range" min="0.65" max="1.3" step="0.01" class="w-full accent-white">
+                        <span id="hero-line-height-value" class="text-[11px] text-right text-white/80 tabular-nums">0.82</span>
+                    </div>
+                    <p id="font-picker-value" class="mt-2 text-[11px] text-white/70">Current: Verdigris MVB Pro Text 700</p>
                 </div>
-                <label for="font-weight-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Weight</label>
-                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
-                    <button id="font-weight-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
-                    <select id="font-weight-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
-                    </select>
-                    <button id="font-weight-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                <div id="dev-index-controls" class="hidden">
+                    <label for="index-case-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Index Body Case</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="index-case-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="index-case-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="index-case-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
+                    </div>
+                    <label for="index-column-gap" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Column Spacing (rem)</label>
+                    <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                        <input id="index-column-gap" type="range" min="0.4" max="3.2" step="0.05" class="w-full accent-white">
+                        <span id="index-column-gap-value" class="text-[11px] text-right text-white/80 tabular-nums">1.00</span>
+                    </div>
+                    <label for="index-body-size-scale" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Body Text Size</label>
+                    <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
+                        <input id="index-body-size-scale" type="range" min="0.75" max="1.6" step="0.01" class="w-full accent-white">
+                        <span id="index-body-size-scale-value" class="text-[11px] text-right text-white/80 tabular-nums">1.00</span>
+                    </div>
+                    <p id="index-controls-value" class="mt-2 text-[11px] text-white/70">Current: All Caps • gap 1.00 • size 1.00</p>
                 </div>
-                <label for="grayscale-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Grayscale</label>
-                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
-                    <button id="grayscale-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
-                    <select id="grayscale-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
-                    </select>
-                    <button id="grayscale-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
-                </div>
-                <label for="invert-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Invert</label>
-                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
-                    <button id="invert-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
-                    <select id="invert-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
-                    </select>
-                    <button id="invert-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
-                </div>
-                <label for="cursor-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Mouse Effect</label>
-                <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
-                    <button id="cursor-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
-                    <select id="cursor-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
-                    </select>
-                    <button id="cursor-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
-                </div>
-                <label for="hero-size-mobile" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Mobile (vw)</label>
-                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
-                    <input id="hero-size-mobile" type="range" min="6" max="18" step="0.1" class="w-full accent-white">
-                    <span id="hero-size-mobile-value" class="text-[11px] text-right text-white/80 tabular-nums">7.0</span>
-                </div>
-                <label for="hero-size-desktop" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Desktop (vw)</label>
-                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
-                    <input id="hero-size-desktop" type="range" min="4" max="14" step="0.1" class="w-full accent-white">
-                    <span id="hero-size-desktop-value" class="text-[11px] text-right text-white/80 tabular-nums">4.3</span>
-                </div>
-                <label for="hero-letter-spacing" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Letter Spacing (em)</label>
-                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
-                    <input id="hero-letter-spacing" type="range" min="-0.12" max="0.12" step="0.005" class="w-full accent-white">
-                    <span id="hero-letter-spacing-value" class="text-[11px] text-right text-white/80 tabular-nums">+0.025</span>
-                </div>
-                <label for="hero-line-height" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Line Height</label>
-                <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
-                    <input id="hero-line-height" type="range" min="0.65" max="1.3" step="0.01" class="w-full accent-white">
-                    <span id="hero-line-height-value" class="text-[11px] text-right text-white/80 tabular-nums">0.82</span>
-                </div>
-                <p id="font-picker-value" class="mt-2 text-[11px] text-white/70">Current: Verdigris MVB Pro Text 700</p>
                 <p class="mt-2 text-[10px] tracking-[0.08em] uppercase text-white/55">Toggle: Ctrl + Shift + D</p>
             </div>
         </section>
@@ -318,57 +392,57 @@
             </div>
 
             <!-- Work Grid - Asymmetric Layout -->
-            <div class="space-y-40 md:space-y-64">
+            <div class="space-y-10 lg:space-y-64">
                 
                 <!-- Row 1: Large & Offset -->
-                <div class="grid md:grid-cols-12 gap-10">
-                    <div class="md:col-span-7 gs-reveal">
-                        <a href="#" id="work-link-1" class="work-card block group cursor-target">
-                            <div class="aspect-[4/5] md:aspect-[16/9] w-full overflow-hidden">
+                <div class="grid lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-7 gs-reveal">
+                        <div id="work-link-1" class="work-card block group">
+                            <div class="aspect-[4/5] lg:aspect-[16/9] w-full overflow-hidden">
                                 <img src="./assets/jardin-a6k.jpg" alt="Jardin d'A6K" class="w-full h-full object-cover">
                             </div>
                             <div class="mt-6">
                                 <h3 class="text-2xl font-display">Jardin d'A6K</h3>
-                                <p class="font-mono-label text-[10px] opacity-55 mt-1">Charleroi — 2019</p>
+                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">Charleroi — 2019</p>
                             </div>
-                        </a>
+                        </div>
                     </div>
-                    <div class="md:col-span-4 md:col-start-9 md:pt-40 gs-reveal">
-                        <a href="#" id="work-link-2" class="work-card block group cursor-target">
+                    <div class="lg:col-span-4 lg:col-start-9 lg:pt-40 gs-reveal">
+                        <div id="work-link-2" class="work-card block group">
                             <div class="aspect-square w-full overflow-hidden">
                                 <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900584494-5ba1b7c0/img-04.jpg" alt="Project Two" class="w-full h-full object-cover">
                             </div>
                             <div class="mt-6">
                                 <h3 class="text-2xl font-display">Fracture</h3>
-                                <p class="font-mono-label text-[10px] opacity-55 mt-1">Experimental Film</p>
+                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">Experimental Film</p>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Row 2: Overlapping -->
-                <div class="grid md:grid-cols-12">
-                    <div class="md:col-span-5 md:col-start-2 gs-reveal">
-                        <a href="#" id="work-link-3" class="work-card block group cursor-target">
+                <div class="grid gap-10 lg:grid-cols-12 lg:gap-0">
+                    <div class="lg:col-span-5 lg:col-start-2 gs-reveal">
+                        <div id="work-link-3" class="work-card block group">
                             <div class="aspect-[3/4] w-full overflow-hidden">
                                 <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900586080-03e32c9d/img-11.jpg" alt="Project Three" class="w-full h-full object-cover">
                             </div>
                             <div class="mt-6">
                                 <h3 class="text-2xl font-display">Silent Void</h3>
-                                <p class="font-mono-label text-[10px] opacity-55 mt-1">Editorial Design</p>
+                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">Editorial Design</p>
                             </div>
-                        </a>
+                        </div>
                     </div>
-                    <div class="md:col-span-5 md:col-start-8 mt-0 md:-mt-40 gs-reveal">
-                        <a href="#" id="work-link-4" class="work-card block group cursor-target">
+                    <div class="lg:col-span-5 lg:col-start-8 mt-0 lg:-mt-40 gs-reveal">
+                        <div id="work-link-4" class="work-card block group">
                             <div class="aspect-[4/5] w-full overflow-hidden">
                                 <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588644-398b820c/img-22.jpg" alt="Project Four" class="w-full h-full object-cover">
                             </div>
                             <div class="mt-6">
                                 <h3 class="text-2xl font-display">Kinetic Structure</h3>
-                                <p class="font-mono-label text-[10px] opacity-55 mt-1">CGI / Motion</p>
+                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">CGI / Motion</p>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 </div>
 
@@ -383,7 +457,7 @@
             </div>
 
             <!-- Table Header -->
-            <div class="hidden md:grid grid-cols-12 gap-4 font-mono-label text-[0.65rem] text-black mb-4 px-2 gs-reveal">
+            <div class="hidden md:grid grid-cols-12 index-dev-grid font-mono-label text-[0.65rem] text-black mb-4 px-2 gs-reveal">
                 <div class="col-span-5">Référence projet</div>
                 <div class="col-span-4">Collaborateur</div>
                 <div class="col-span-2">Typologie</div>
@@ -420,7 +494,7 @@
                     const listContainer = document.getElementById('index-list');
                     indexData.forEach(item => {
                         const row = document.createElement('div');
-                        row.className = 'index-row-container grid grid-cols-2 md:grid-cols-12 gap-4 text-xl md:text-3xl lg:text-[2.5vw] font-medium tracking-tighter uppercase leading-[1.05] py-1 cursor-target transition-all duration-300';
+                        row.className = 'index-row-container index-body-row index-dev-grid grid grid-cols-2 md:grid-cols-12 font-medium leading-[1.05] py-1 cursor-target transition-all duration-300';
                         row.setAttribute('data-img', item.img);
                         row.innerHTML = `
                             <div class="col-span-1 md:col-span-5 index-text transition-colors duration-300">${item.name}</div>
@@ -603,6 +677,9 @@
 
             // 7. Dev Mode Hero Controls (Ctrl + Shift + D)
             const devModePanel = document.getElementById('dev-mode-panel');
+            const devHeroControls = document.getElementById('dev-hero-controls');
+            const devIndexControls = document.getElementById('dev-index-controls');
+            const devTextInspector = document.getElementById('dev-text-inspector');
             const fontPicker = document.getElementById('font-picker');
             const fontWeightPicker = document.getElementById('font-weight-picker');
             const fontPickerValue = document.getElementById('font-picker-value');
@@ -619,6 +696,14 @@
             const cursorEffectPrev = document.getElementById('cursor-effect-prev');
             const cursorEffectPicker = document.getElementById('cursor-effect-picker');
             const cursorEffectNext = document.getElementById('cursor-effect-next');
+            const indexCasePrev = document.getElementById('index-case-prev');
+            const indexCasePicker = document.getElementById('index-case-picker');
+            const indexCaseNext = document.getElementById('index-case-next');
+            const indexColumnGap = document.getElementById('index-column-gap');
+            const indexColumnGapValue = document.getElementById('index-column-gap-value');
+            const indexBodySizeScale = document.getElementById('index-body-size-scale');
+            const indexBodySizeScaleValue = document.getElementById('index-body-size-scale-value');
+            const indexControlsValue = document.getElementById('index-controls-value');
             const heroSizeMobile = document.getElementById('hero-size-mobile');
             const heroSizeDesktop = document.getElementById('hero-size-desktop');
             const heroLetterSpacing = document.getElementById('hero-letter-spacing');
@@ -630,6 +715,7 @@
             const heroVideo = document.getElementById('hero-img');
             const heroTitle = document.getElementById('hero-title');
             const heroSection = document.getElementById('hero');
+            const indexSection = document.getElementById('index');
             const videoAwareTargets = Array.from(document.querySelectorAll('.video-aware-text'));
             const syncNavToneWithBackground = () => {
                 if (!heroSection) return;
@@ -665,9 +751,16 @@
                 { label: "Off", value: "off" },
                 { label: "On", value: "on" }
             ];
+            const indexCaseOptions = [
+                { label: "All Caps", value: "uppercase" },
+                { label: "Normal Caps", value: "normalcaps" }
+            ];
 
             if (
                 devModePanel &&
+                devHeroControls &&
+                devIndexControls &&
+                devTextInspector &&
                 fontPicker &&
                 fontWeightPicker &&
                 fontPickerValue &&
@@ -684,6 +777,14 @@
                 cursorEffectPrev &&
                 cursorEffectPicker &&
                 cursorEffectNext &&
+                indexCasePrev &&
+                indexCasePicker &&
+                indexCaseNext &&
+                indexColumnGap &&
+                indexColumnGapValue &&
+                indexBodySizeScale &&
+                indexBodySizeScaleValue &&
+                indexControlsValue &&
                 heroSizeMobile &&
                 heroSizeDesktop &&
                 heroLetterSpacing &&
@@ -723,6 +824,12 @@
                     option.value = cursorEffectOption.value;
                     option.textContent = cursorEffectOption.label;
                     cursorEffectPicker.appendChild(option);
+                });
+                indexCaseOptions.forEach((caseOption) => {
+                    const option = document.createElement('option');
+                    option.value = caseOption.value;
+                    option.textContent = caseOption.label;
+                    indexCasePicker.appendChild(option);
                 });
 
                 const getFontConfig = (fontFamily) => {
@@ -803,6 +910,100 @@
                     localStorage.setItem('devHeroLetterSpacing', String(normalized.letterSpacing));
                     localStorage.setItem('devHeroLineHeight', String(normalized.lineHeight));
                 };
+                const applyIndexCase = (caseValue) => {
+                    const mode = indexCaseOptions.find((option) => option.value === caseValue) || indexCaseOptions[0];
+                    indexCasePicker.value = mode.value;
+                    document.body.classList.toggle('index-case-normalcaps', mode.value === 'normalcaps');
+                    localStorage.setItem('devIndexCase', mode.value);
+                };
+                const applyIndexLayout = (settings) => {
+                    const normalizedGap = clamp(settings.columnGap, 0.4, 3.2);
+                    const normalizedScale = clamp(settings.bodyScale, 0.75, 1.6);
+                    document.documentElement.style.setProperty('--index-column-gap', `${normalizedGap}rem`);
+                    document.documentElement.style.setProperty('--index-body-size-scale', `${normalizedScale}`);
+                    indexColumnGap.value = normalizedGap.toFixed(2);
+                    indexBodySizeScale.value = normalizedScale.toFixed(2);
+                    indexColumnGapValue.textContent = normalizedGap.toFixed(2);
+                    indexBodySizeScaleValue.textContent = normalizedScale.toFixed(2);
+                    const caseLabel = indexCasePicker.value === 'normalcaps' ? 'Normal Caps' : 'All Caps';
+                    indexControlsValue.textContent = `Current: ${caseLabel} • gap ${normalizedGap.toFixed(2)} • size ${normalizedScale.toFixed(2)}`;
+                    localStorage.setItem('devIndexColumnGap', String(normalizedGap));
+                    localStorage.setItem('devIndexBodyScale', String(normalizedScale));
+                };
+                const detectDevContext = () => {
+                    if (!indexSection) return 'hero';
+                    const rect = indexSection.getBoundingClientRect();
+                    const viewportMid = window.innerHeight * 0.5;
+                    return rect.top <= viewportMid && rect.bottom >= viewportMid ? 'index' : 'hero';
+                };
+                const applyDevContext = (context) => {
+                    const isIndexContext = context === 'index';
+                    devHeroControls.classList.toggle('hidden', isIndexContext);
+                    devIndexControls.classList.toggle('hidden', !isIndexContext);
+                };
+                const hideDevTextInspector = () => {
+                    devTextInspector.classList.remove('visible');
+                };
+                const getInspectableElement = (startElement) => {
+                    let current = startElement instanceof Element ? startElement : null;
+                    while (current && current !== document.body) {
+                        if (
+                            current.id === 'dev-text-inspector' ||
+                            current.closest('#dev-mode-panel') ||
+                            current.matches('video, img, svg, canvas, input, select, option, button')
+                        ) {
+                            return null;
+                        }
+                        const textValue = current.textContent ? current.textContent.trim() : '';
+                        if (textValue.length) {
+                            const style = window.getComputedStyle(current);
+                            if (
+                                style.display !== 'none' &&
+                                style.visibility !== 'hidden' &&
+                                Number(style.opacity) > 0
+                            ) {
+                                return current;
+                            }
+                        }
+                        current = current.parentElement;
+                    }
+                    return null;
+                };
+                const placeTextInspector = (targetElement) => {
+                    const targetRect = targetElement.getBoundingClientRect();
+                    const inspectorRect = devTextInspector.getBoundingClientRect();
+                    const horizontalPadding = 8;
+                    let left = targetRect.left + (targetRect.width / 2) - (inspectorRect.width / 2);
+                    left = clamp(left, horizontalPadding, window.innerWidth - inspectorRect.width - horizontalPadding);
+                    let top = targetRect.top - inspectorRect.height - 10;
+                    if (top < horizontalPadding) {
+                        top = Math.min(
+                            window.innerHeight - inspectorRect.height - horizontalPadding,
+                            targetRect.bottom + 10
+                        );
+                    }
+                    devTextInspector.style.left = `${left}px`;
+                    devTextInspector.style.top = `${top}px`;
+                };
+                const showDevTextInspector = (targetElement) => {
+                    const style = window.getComputedStyle(targetElement);
+                    const textSnippet = (targetElement.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 44);
+                    const styleLines = [
+                        `TEXT: ${textSnippet}${textSnippet.length >= 44 ? '…' : ''}`,
+                        `family: ${style.fontFamily}`,
+                        `weight: ${style.fontWeight}`,
+                        `size: ${style.fontSize}`,
+                        `line-height: ${style.lineHeight}`,
+                        `letter-spacing: ${style.letterSpacing}`,
+                        `transform: ${style.textTransform}`,
+                        `color: ${style.color}`
+                    ];
+                    devTextInspector.textContent = styleLines.join('\n');
+                    devTextInspector.classList.add('visible');
+                    requestAnimationFrame(() => {
+                        placeTextInspector(targetElement);
+                    });
+                };
 
                 const defaultPreset = {
                     font: "'Verdigris MVB Pro Text', serif",
@@ -814,6 +1015,11 @@
                     sizeDesktop: 4.3,
                     letterSpacing: 0.025,
                     lineHeight: 0.82
+                };
+                const indexDefaultPreset = {
+                    case: "normalcaps",
+                    columnGap: 3.2,
+                    bodyScale: 0.75
                 };
                 const defaultPresetVersion = "2026-03-11";
                 if (localStorage.getItem('devHeroDefaultsVersion') !== defaultPresetVersion) {
@@ -828,12 +1034,20 @@
                     localStorage.setItem('devHeroLineHeight', String(defaultPreset.lineHeight));
                     localStorage.setItem('devHeroDefaultsVersion', defaultPresetVersion);
                 }
+                const indexDefaultPresetVersion = "2026-03-08";
+                if (localStorage.getItem('devIndexDefaultsVersion') !== indexDefaultPresetVersion) {
+                    localStorage.setItem('devIndexCase', indexDefaultPreset.case);
+                    localStorage.setItem('devIndexColumnGap', String(indexDefaultPreset.columnGap));
+                    localStorage.setItem('devIndexBodyScale', String(indexDefaultPreset.bodyScale));
+                    localStorage.setItem('devIndexDefaultsVersion', indexDefaultPresetVersion);
+                }
 
                 const savedFont = localStorage.getItem('devHeroFont');
                 const savedWeight = localStorage.getItem('devHeroFontWeight');
                 const savedGrayscale = localStorage.getItem('devHeroGrayscale');
                 const savedInvert = localStorage.getItem('devHeroInvert');
                 const savedCursorEffect = localStorage.getItem('devCursorEffect');
+                const savedIndexCase = localStorage.getItem('devIndexCase');
                 const initialFont = serifFontOptions.some((option) => option.family === savedFont) ? savedFont : defaultPreset.font;
                 fontPicker.value = initialFont;
                 const initialFontConfig = getFontConfig(initialFont);
@@ -850,6 +1064,13 @@
                     letterSpacing: getStoredNumber('devHeroLetterSpacing', defaultPreset.letterSpacing),
                     lineHeight: getStoredNumber('devHeroLineHeight', defaultPreset.lineHeight)
                 });
+                const normalizedSavedIndexCase = savedIndexCase === 'smallcaps' ? 'normalcaps' : savedIndexCase;
+                applyIndexCase(normalizedSavedIndexCase || indexDefaultPreset.case);
+                applyIndexLayout({
+                    columnGap: getStoredNumber('devIndexColumnGap', indexDefaultPreset.columnGap),
+                    bodyScale: getStoredNumber('devIndexBodyScale', indexDefaultPreset.bodyScale)
+                });
+                applyDevContext(detectDevContext());
 
                 fontPicker.addEventListener('change', () => {
                     const nextFontConfig = getFontConfig(fontPicker.value);
@@ -868,6 +1089,13 @@
                 cursorEffectPicker.addEventListener('change', () => {
                     applyCursorEffectMode(cursorEffectPicker.value);
                 });
+                indexCasePicker.addEventListener('change', () => {
+                    applyIndexCase(indexCasePicker.value);
+                    applyIndexLayout({
+                        columnGap: Number(indexColumnGap.value),
+                        bodyScale: Number(indexBodySizeScale.value)
+                    });
+                });
 
                 [heroSizeMobile, heroSizeDesktop, heroLetterSpacing, heroLineHeight].forEach((input) => {
                     input.addEventListener('input', () => {
@@ -876,6 +1104,14 @@
                             sizeDesktop: Number(heroSizeDesktop.value),
                             letterSpacing: Number(heroLetterSpacing.value),
                             lineHeight: Number(heroLineHeight.value)
+                        });
+                    });
+                });
+                [indexColumnGap, indexBodySizeScale].forEach((input) => {
+                    input.addEventListener('input', () => {
+                        applyIndexLayout({
+                            columnGap: Number(indexColumnGap.value),
+                            bodyScale: Number(indexBodySizeScale.value)
                         });
                     });
                 });
@@ -897,13 +1133,32 @@
                 invertNext.addEventListener('click', () => cycleSelect(invertPicker, 1));
                 cursorEffectPrev.addEventListener('click', () => cycleSelect(cursorEffectPicker, -1));
                 cursorEffectNext.addEventListener('click', () => cycleSelect(cursorEffectPicker, 1));
+                indexCasePrev.addEventListener('click', () => cycleSelect(indexCasePicker, -1));
+                indexCaseNext.addEventListener('click', () => cycleSelect(indexCasePicker, 1));
+                window.addEventListener('scroll', () => applyDevContext(detectDevContext()), { passive: true });
+                window.addEventListener('resize', () => applyDevContext(detectDevContext()));
+                window.addEventListener('scroll', hideDevTextInspector, { passive: true });
+                window.addEventListener('resize', hideDevTextInspector);
+                document.addEventListener('click', (event) => {
+                    if (!isDevModeVisible) return;
+                    const inspectable = getInspectableElement(event.target);
+                    if (!inspectable) {
+                        hideDevTextInspector();
+                        return;
+                    }
+                    showDevTextInspector(inspectable);
+                });
 
                 let isDevModeVisible = false;
                 window.addEventListener('keydown', (e) => {
                     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'd') {
                         e.preventDefault();
                         isDevModeVisible = !isDevModeVisible;
+                        applyDevContext(detectDevContext());
                         devModePanel.classList.toggle('hidden', !isDevModeVisible);
+                        if (!isDevModeVisible) {
+                            hideDevTextInspector();
+                        }
                     }
                 });
             }
