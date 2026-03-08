@@ -137,6 +137,21 @@
             letter-spacing: var(--hero-title-letter-spacing);
             mix-blend-mode: difference;
         }
+        .hero-title-word {
+            white-space: nowrap;
+        }
+        .hero-effect-char {
+            display: inline-block;
+            transform-origin: 50% 72%;
+            will-change: transform, opacity, filter;
+            backface-visibility: hidden;
+        }
+        #hero-title.hero-effect-breeze .hero-effect-char {
+            text-shadow: 0 0 0.02em rgba(226, 244, 230, 0.2);
+        }
+        #hero-title.hero-effect-rain .hero-effect-char {
+            text-shadow: 0 0 0.018em rgba(210, 236, 255, 0.22);
+        }
         @media (min-width: 768px) {
             #hero-title {
                 font-size: var(--hero-title-size-desktop);
@@ -252,8 +267,8 @@
 
         <!-- Minimal Navigation -->
         <nav class="fixed top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-50 text-white pointer-events-none">
-            <a href="#" id="nav-brand" class="text-sm md:text-base font-semibold tracking-[0.18em] leading-none pointer-events-auto cursor-target video-aware-text" style="font-variant-caps: all-small-caps;">
-                SL
+            <a href="#" id="nav-brand" class="text-sm md:text-base font-semibold tracking-[0.18em] leading-none pointer-events-auto cursor-target video-aware-text">
+                Studio Sébastien Lacomblez
             </a>
             <div class="text-sm font-medium tracking-widest uppercase flex flex-col items-end gap-1 pointer-events-auto cursor-target">
                 <a href="#work" class="hover:opacity-50 transition-opacity video-aware-text">Works</a>
@@ -299,6 +314,13 @@
                             <input id="variable-axis-slider" type="range" min="100" max="900" step="10" class="w-full accent-white">
                             <span id="variable-axis-value" class="text-[11px] text-right text-white/80 tabular-nums">100</span>
                         </div>
+                    </div>
+                    <label for="text-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Text Effect</label>
+                    <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
+                        <button id="text-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
+                        <select id="text-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
+                        </select>
+                        <button id="text-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
                     <label for="grayscale-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Grayscale</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
@@ -780,6 +802,9 @@
             const variableAxisLabel = document.getElementById('variable-axis-label');
             const variableAxisSlider = document.getElementById('variable-axis-slider');
             const variableAxisValue = document.getElementById('variable-axis-value');
+            const textEffectPrev = document.getElementById('text-effect-prev');
+            const textEffectPicker = document.getElementById('text-effect-picker');
+            const textEffectNext = document.getElementById('text-effect-next');
             const fontPickerValue = document.getElementById('font-picker-value');
             const fontPrev = document.getElementById('font-prev');
             const fontNext = document.getElementById('font-next');
@@ -856,6 +881,12 @@
                 { label: "Off", value: "off" },
                 { label: "On", value: "on" }
             ];
+            const textEffectOptions = [
+                { label: "Off", value: "off" },
+                { label: "Water Ripple", value: "ripple" },
+                { label: "Canopy Breeze", value: "breeze" },
+                { label: "Rain Drops Warp", value: "rain" }
+            ];
             const indexCaseOptions = [
                 { label: "All Caps", value: "uppercase" },
                 { label: "Normal Caps", value: "normalcaps" }
@@ -872,6 +903,9 @@
                 variableAxisLabel &&
                 variableAxisSlider &&
                 variableAxisValue &&
+                textEffectPrev &&
+                textEffectPicker &&
+                textEffectNext &&
                 fontPickerValue &&
                 fontPrev &&
                 fontNext &&
@@ -934,6 +968,12 @@
                     option.textContent = cursorEffectOption.label;
                     cursorEffectPicker.appendChild(option);
                 });
+                textEffectOptions.forEach((textEffectOption) => {
+                    const option = document.createElement('option');
+                    option.value = textEffectOption.value;
+                    option.textContent = textEffectOption.label;
+                    textEffectPicker.appendChild(option);
+                });
                 indexCaseOptions.forEach((caseOption) => {
                     const option = document.createElement('option');
                     option.value = caseOption.value;
@@ -989,6 +1029,202 @@
                     }
                     localStorage.setItem(storageKey, String(axisValue));
                 };
+                const heroWordElements = Array.from(heroTitle.querySelectorAll('.hero-title-word'));
+                const heroEffectWords = [];
+                const heroEffectChars = [];
+                let heroEffectMode = 'off';
+                let heroEffectFrameId = null;
+                let ripplePulse = null;
+                const rainDrops = [];
+                let rainNextSpawnAt = 0;
+                const heroEffectClasses = ['hero-effect-ripple', 'hero-effect-breeze', 'hero-effect-rain'];
+                const resetHeroTextEffects = () => {
+                    heroEffectWords.forEach((word) => {
+                        word.element.style.removeProperty('transform');
+                    });
+                    heroEffectChars.forEach((charMeta) => {
+                        charMeta.element.style.removeProperty('transform');
+                        charMeta.element.style.removeProperty('opacity');
+                        charMeta.element.style.removeProperty('filter');
+                    });
+                    rainDrops.length = 0;
+                    ripplePulse = null;
+                };
+                const stopHeroTextEffectLoop = () => {
+                    if (heroEffectFrameId !== null) {
+                        cancelAnimationFrame(heroEffectFrameId);
+                        heroEffectFrameId = null;
+                    }
+                };
+                const prepareHeroTextEffectCharacters = () => {
+                    heroEffectWords.length = 0;
+                    heroEffectChars.length = 0;
+                    const wordCount = Math.max(1, heroWordElements.length);
+                    heroWordElements.forEach((wordElement, wordIndex) => {
+                        const rawText = (wordElement.dataset.originalText || wordElement.textContent || '').trim();
+                        wordElement.dataset.originalText = rawText;
+                        wordElement.textContent = '';
+                        const fragment = document.createDocumentFragment();
+                        const chars = [];
+                        const glyphs = Array.from(rawText);
+                        const maxCharIndex = Math.max(1, glyphs.length - 1);
+                        glyphs.forEach((glyph, charIndex) => {
+                            const span = document.createElement('span');
+                            span.className = 'hero-effect-char';
+                            span.textContent = glyph;
+                            fragment.appendChild(span);
+                            const xNorm = glyphs.length > 1 ? charIndex / maxCharIndex : 0.5;
+                            const yNorm = wordCount > 1 ? wordIndex / (wordCount - 1) : 0.5;
+                            const charMeta = {
+                                element: span,
+                                wordIndex,
+                                charIndex,
+                                xNorm,
+                                yNorm,
+                                randA: Math.random(),
+                                randB: Math.random(),
+                                randC: Math.random()
+                            };
+                            chars.push(charMeta);
+                            heroEffectChars.push(charMeta);
+                        });
+                        wordElement.appendChild(fragment);
+                        heroEffectWords.push({ element: wordElement, chars });
+                    });
+                };
+                const spawnRipplePulse = (timeSeconds) => {
+                    const source = heroEffectChars[Math.floor(Math.random() * heroEffectChars.length)];
+                    if (!source) return;
+                    ripplePulse = {
+                        x: source.xNorm + ((Math.random() - 0.5) * 0.08),
+                        y: source.yNorm + ((Math.random() - 0.5) * 0.1),
+                        startedAt: timeSeconds,
+                        strength: 0.85 + (Math.random() * 0.5)
+                    };
+                };
+                const renderRippleEffect = (timeSeconds) => {
+                    if (!ripplePulse || timeSeconds - ripplePulse.startedAt > 2.8) {
+                        spawnRipplePulse(timeSeconds);
+                    }
+                    if (!ripplePulse) return;
+                    heroEffectWords.forEach((word, wordIndex) => {
+                        const drift = Math.sin((timeSeconds * 1.05) + (wordIndex * 0.55)) * 1.4;
+                        word.element.style.transform = `translate3d(${drift.toFixed(2)}px, 0, 0)`;
+                    });
+                    heroEffectChars.forEach((charMeta) => {
+                        const dx = charMeta.xNorm - ripplePulse.x;
+                        const dy = (charMeta.yNorm - ripplePulse.y) * 0.9;
+                        const distance = Math.hypot(dx, dy);
+                        const elapsed = timeSeconds - ripplePulse.startedAt;
+                        const travel = elapsed * 1.35;
+                        const wave = Math.sin((travel - (distance * 2.7)) * 10.5)
+                            * Math.exp(-distance * 2.3)
+                            * Math.exp(-elapsed * 0.42)
+                            * ripplePulse.strength;
+                        const micro = Math.sin((timeSeconds * (2.2 + charMeta.randA)) + (charMeta.randB * 6.28318)) * 0.22;
+                        const tx = (dx * wave * 11) + (Math.cos((timeSeconds * 1.6) + (charMeta.randC * 6.28318)) * micro * 2.2);
+                        const ty = (wave * 9.5) + (micro * 3);
+                        const rot = (wave * 6.2) + (micro * 2.6);
+                        const opacity = 1 - Math.min(0.16, Math.abs(wave) * 0.1);
+                        charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg)`;
+                        charMeta.element.style.opacity = opacity.toFixed(3);
+                    });
+                };
+                const renderBreezeEffect = (timeSeconds) => {
+                    heroEffectWords.forEach((word, wordIndex) => {
+                        const sway = Math.sin((timeSeconds * 0.74) + (wordIndex * 0.92)) * 2.7;
+                        const lift = Math.cos((timeSeconds * 0.53) + (wordIndex * 0.71)) * 1.2;
+                        word.element.style.transform = `translate3d(${sway.toFixed(2)}px, ${lift.toFixed(2)}px, 0)`;
+                    });
+                    heroEffectChars.forEach((charMeta) => {
+                        const phase = (timeSeconds * 1.3) + (charMeta.charIndex * 0.46) + (charMeta.wordIndex * 0.83) + (charMeta.randA * 5.4);
+                        const tx = (Math.sin(phase) * 2.1) + (Math.cos((timeSeconds * 0.7) + (charMeta.randB * 5.8)) * 0.8);
+                        const ty = (Math.cos(phase * 0.9) * 1.8) + (Math.sin((timeSeconds * 0.84) + (charMeta.randC * 6.2)) * 0.7);
+                        const rot = Math.sin(phase * 0.82) * 2.9;
+                        const scaleY = 1 + (Math.cos(phase * 0.68) * 0.025);
+                        charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scaleY(${scaleY.toFixed(3)})`;
+                        charMeta.element.style.opacity = '1';
+                    });
+                };
+                const maybeSpawnRainDrop = (timeSeconds) => {
+                    if (timeSeconds < rainNextSpawnAt) return;
+                    rainDrops.push({
+                        x: Math.random(),
+                        y: Math.random(),
+                        startedAt: timeSeconds,
+                        force: 0.7 + (Math.random() * 0.7)
+                    });
+                    rainNextSpawnAt = timeSeconds + 0.2 + (Math.random() * 0.45);
+                };
+                const renderRainEffect = (timeSeconds) => {
+                    maybeSpawnRainDrop(timeSeconds);
+                    for (let i = rainDrops.length - 1; i >= 0; i -= 1) {
+                        if (timeSeconds - rainDrops[i].startedAt > 2.1) {
+                            rainDrops.splice(i, 1);
+                        }
+                    }
+                    heroEffectWords.forEach((word) => {
+                        word.element.style.transform = '';
+                    });
+                    heroEffectChars.forEach((charMeta) => {
+                        let tx = 0;
+                        let ty = 0;
+                        let rot = 0;
+                        let shimmer = 0;
+                        rainDrops.forEach((drop) => {
+                            const age = timeSeconds - drop.startedAt;
+                            if (age < 0) return;
+                            const radius = age * 0.55;
+                            const dx = charMeta.xNorm - drop.x;
+                            const dy = (charMeta.yNorm - drop.y) * 1.45;
+                            const dist = Math.hypot(dx, dy) + 0.0001;
+                            const ring = Math.exp(-Math.pow((dist - radius) * 10.5, 2)) * Math.exp(-age * 0.45);
+                            const impact = Math.exp(-Math.pow(dist * 14, 2)) * Math.exp(-age * 4.8);
+                            tx += (dx / dist) * ring * drop.force * 10.5;
+                            ty += (dy / dist) * ring * drop.force * 6.8 - (impact * drop.force * 8.2);
+                            rot += dx * ring * drop.force * 28;
+                            shimmer += (ring * 0.65) + (impact * 0.5);
+                        });
+                        const scaleY = 1 + Math.min(0.08, shimmer * 0.05);
+                        const opacity = 1 - Math.min(0.18, shimmer * 0.1);
+                        charMeta.element.style.transform = `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scaleY(${scaleY.toFixed(3)})`;
+                        charMeta.element.style.opacity = opacity.toFixed(3);
+                    });
+                };
+                const runHeroTextEffectFrame = (timestamp) => {
+                    if (heroEffectMode === 'off') {
+                        heroEffectFrameId = null;
+                        return;
+                    }
+                    const timeSeconds = timestamp / 1000;
+                    if (heroEffectMode === 'ripple') {
+                        renderRippleEffect(timeSeconds);
+                    } else if (heroEffectMode === 'breeze') {
+                        renderBreezeEffect(timeSeconds);
+                    } else if (heroEffectMode === 'rain') {
+                        renderRainEffect(timeSeconds);
+                    }
+                    heroEffectFrameId = requestAnimationFrame(runHeroTextEffectFrame);
+                };
+                const startHeroTextEffectLoop = () => {
+                    if (heroEffectFrameId !== null) return;
+                    heroEffectFrameId = requestAnimationFrame(runHeroTextEffectFrame);
+                };
+                const applyHeroTextEffect = (effectValue) => {
+                    const matched = textEffectOptions.find((effectOption) => effectOption.value === effectValue) || textEffectOptions[0];
+                    heroEffectMode = matched.value;
+                    textEffectPicker.value = matched.value;
+                    localStorage.setItem('devHeroTextEffect', matched.value);
+                    heroTitle.classList.remove(...heroEffectClasses);
+                    if (matched.value === 'off') {
+                        stopHeroTextEffectLoop();
+                        resetHeroTextEffects();
+                        return;
+                    }
+                    heroTitle.classList.add(`hero-effect-${matched.value}`);
+                    startHeroTextEffectLoop();
+                };
+                prepareHeroTextEffectCharacters();
 
                 const refreshWeightOptions = (fontConfig, preferredWeight) => {
                     fontWeightPicker.innerHTML = '';
@@ -1196,18 +1432,23 @@
                     localStorage.setItem('devIndexBodyScale', String(indexDefaultPreset.bodyScale));
                     localStorage.setItem('devIndexDefaultsVersion', indexDefaultPresetVersion);
                 }
+                if (!localStorage.getItem('devHeroTextEffect')) {
+                    localStorage.setItem('devHeroTextEffect', 'off');
+                }
 
                 const savedFont = localStorage.getItem('devHeroFont');
                 const savedWeight = localStorage.getItem('devHeroFontWeight');
                 const savedGrayscale = localStorage.getItem('devHeroGrayscale');
                 const savedInvert = localStorage.getItem('devHeroInvert');
                 const savedCursorEffect = localStorage.getItem('devCursorEffect');
+                const savedTextEffect = localStorage.getItem('devHeroTextEffect');
                 const savedIndexCase = localStorage.getItem('devIndexCase');
                 const initialFont = serifFontOptions.some((option) => option.family === savedFont) ? savedFont : defaultPreset.font;
                 fontPicker.value = initialFont;
                 const initialFontConfig = getFontConfig(initialFont);
                 const initialWeight = refreshWeightOptions(initialFontConfig, savedWeight);
                 applyHeroFont(initialFont, initialWeight);
+                applyHeroTextEffect(savedTextEffect || 'off');
                 grayscalePicker.value = savedGrayscale || defaultPreset.grayscale;
                 invertPicker.value = savedInvert || defaultPreset.invert;
                 updateVideoFilters();
@@ -1238,6 +1479,9 @@
                 variableAxisSlider.addEventListener('input', () => {
                     const activeFontConfig = getFontConfig(fontPicker.value);
                     applyHeroVariableAxis(activeFontConfig, Number(variableAxisSlider.value));
+                });
+                textEffectPicker.addEventListener('change', () => {
+                    applyHeroTextEffect(textEffectPicker.value);
                 });
                 grayscalePicker.addEventListener('change', () => {
                     updateVideoFilters();
@@ -1286,6 +1530,8 @@
                 fontNext.addEventListener('click', () => cycleSelect(fontPicker, 1));
                 fontWeightPrev.addEventListener('click', () => cycleSelect(fontWeightPicker, -1));
                 fontWeightNext.addEventListener('click', () => cycleSelect(fontWeightPicker, 1));
+                textEffectPrev.addEventListener('click', () => cycleSelect(textEffectPicker, -1));
+                textEffectNext.addEventListener('click', () => cycleSelect(textEffectPicker, 1));
                 grayscalePrev.addEventListener('click', () => cycleSelect(grayscalePicker, -1));
                 grayscaleNext.addEventListener('click', () => cycleSelect(grayscalePicker, 1));
                 invertPrev.addEventListener('click', () => cycleSelect(invertPicker, -1));
@@ -1298,6 +1544,15 @@
                 window.addEventListener('resize', () => applyDevContext(detectDevContext()));
                 window.addEventListener('scroll', hideDevTextInspector, { passive: true });
                 window.addEventListener('resize', hideDevTextInspector);
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        stopHeroTextEffectLoop();
+                        return;
+                    }
+                    if (heroEffectMode !== 'off') {
+                        startHeroTextEffectLoop();
+                    }
+                });
                 document.addEventListener('click', (event) => {
                     if (!isDevModeVisible) return;
                     const inspectable = getInspectableElement(event.target);
