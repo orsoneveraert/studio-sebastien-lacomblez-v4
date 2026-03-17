@@ -446,15 +446,12 @@
             }
             #index .index-head-ref,
             #index .index-head-client,
+            #index .index-head-type,
             #index .index-col-ref,
-            #index .index-col-client {
+            #index .index-col-client,
+            #index .index-col-type {
                 overflow: hidden;
                 text-overflow: ellipsis;
-            }
-            #index .index-head-year,
-            #index .index-col-year {
-                border-left: 1px solid rgba(0, 0, 0, 0.22);
-                padding-left: clamp(0.45rem, 0.7vw, 0.85rem);
             }
         }
         #index-list .index-body-row {
@@ -464,7 +461,16 @@
             text-transform: uppercase;
             letter-spacing: -0.02em;
         }
-        @media (min-width: 768px) {
+        @media (min-width: 768px) and (max-width: 1279px) {
+            #index .index-dev-grid {
+                gap: clamp(0.55rem, 0.95vw, 1.2rem);
+            }
+            #index-list .index-body-row {
+                font-size: clamp(1rem, calc(1.25vw * var(--index-body-size-scale)), 1.42rem);
+                letter-spacing: -0.012em;
+            }
+        }
+        @media (min-width: 1280px) {
             #index-list .index-body-row {
                 font-size: clamp(1.68rem, calc(2.34vw * var(--index-body-size-scale)), 3.8rem);
             }
@@ -903,10 +909,10 @@
 
             <!-- Table Header -->
             <div class="hidden md:grid grid-cols-12 index-dev-grid font-mono-label text-[0.65rem] text-black mb-4 px-2 gs-reveal">
-                <div class="col-span-4 index-head-ref">Reference</div>
-                <div class="col-span-5 index-head-client">Client</div>
-                <div class="col-span-2 index-head-type">Typologie</div>
-                <div class="col-span-1 text-right index-head-year">Annee</div>
+                <div class="col-span-3 lg:col-span-4 index-head-ref">Reference</div>
+                <div class="col-span-4 lg:col-span-5 index-head-client">Client</div>
+                <div class="col-span-3 lg:col-span-2 index-head-type">Typologie</div>
+                <div class="col-span-2 lg:col-span-1 text-right index-head-year">Annee</div>
             </div>
 
             <!-- The List (Zero padding/margins to mimic text block) -->
@@ -942,6 +948,33 @@
                             .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                             .join(' ');
                     };
+                    const clientCities = new Set([
+                        "Bruxelles",
+                        "Charleroi",
+                        "Montreal",
+                        "Vilvorde",
+                        "Paris",
+                        "Mons",
+                        "Venise",
+                        "Linz",
+                        "Enschede",
+                        "Anvers"
+                    ]);
+                    const formatClient = (value) => {
+                        const raw = String(value || '').trim();
+                        if (!raw) return '';
+                        const tokens = raw.split(/\s+/);
+                        const lastToken = tokens[tokens.length - 1] || '';
+                        const city = lastToken.replace(/[.,;:!?]+$/, '');
+                        if (!clientCities.has(city)) return raw;
+                        const base = raw.slice(0, raw.lastIndexOf(lastToken)).trim().replace(/,\s*$/, '');
+                        return base ? `${base}, ${city}` : city;
+                    };
+                    const formatYear = (value) => {
+                        const raw = String(value || '').trim();
+                        if (!raw) return '';
+                        return raw.replace(/\s*([\-–—])\s*$/, '$1en cours');
+                    };
                     const indexData = [
                         { name: "Les Formes Vides", client: "Musee Horta Bruxelles", type: "exposition", year: "2026" },
                         { name: "Jardin de la non-dualite", client: "SSL", type: "jardin", year: "2024–" },
@@ -969,7 +1002,9 @@
                         { name: "Animals", client: "Fondation Verbeke Anvers", type: "exposition", year: "2011" }
                     ].map((item, index) => ({
                         ...item,
+                        client: formatClient(item.client),
                         type: formatTypology(item.type),
+                        year: formatYear(item.year),
                         img: indexImagePool[index % indexImagePool.length]
                     }));
                     
@@ -979,10 +1014,10 @@
                         row.className = 'index-row-container index-body-row index-dev-grid grid grid-cols-2 md:grid-cols-12 leading-[1.05] py-1 cursor-target transition-all duration-300';
                         row.setAttribute('data-img', item.img);
                         row.innerHTML = `
-                            <div class="col-span-1 md:col-span-4 index-text index-col-ref transition-colors duration-300">${item.name}</div>
-                            <div class="hidden md:block col-span-5 index-text index-col-client transition-colors duration-300">${item.client}</div>
-                            <div class="hidden md:block col-span-2 index-text index-col-type transition-colors duration-300">${item.type}</div>
-                            <div class="col-span-1 md:col-span-1 text-right index-text index-col-year transition-colors duration-300">${item.year}</div>
+                            <div class="col-span-1 md:col-span-3 lg:col-span-4 index-text index-col-ref transition-colors duration-300">${item.name}</div>
+                            <div class="hidden md:block md:col-span-4 lg:col-span-5 index-text index-col-client transition-colors duration-300">${item.client}</div>
+                            <div class="hidden md:block md:col-span-3 lg:col-span-2 index-text index-col-type transition-colors duration-300">${item.type}</div>
+                            <div class="col-span-1 md:col-span-2 lg:col-span-1 text-right index-text index-col-year transition-colors duration-300">${item.year}</div>
                         `;
                         listContainer.appendChild(row);
                     });
