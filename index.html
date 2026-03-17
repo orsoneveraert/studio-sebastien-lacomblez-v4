@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://vgbujcuwptvheqijyjbe.supabase.co" crossorigin>
     <link rel="preload" as="image" href="./assets/hero-scroll/scene-1.webp" type="image/webp" fetchpriority="high">
     <link rel="preload" as="image" href="./assets/hero-scroll/scene-1.png" type="image/png">
+    <link rel="preload" as="image" href="./assets/hero-posters/IMG_3550.jpg" type="image/jpeg" fetchpriority="high">
+    <link rel="preload" as="image" href="./assets/hero-slides/slide-0_0-20-2.png" type="image/png">
+    <link rel="preload" as="image" href="./assets/hero-slides/slide-0_0.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700&family=Cormorant:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Cormorant+Infant:wght@300;400;500;600;700&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Bodoni:wght@400;500;600;700&family=Newsreader:wght@400;500;600;700&family=Noto+Serif+Display:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Source+Serif+4:wght@300;400;500;600;700&family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
@@ -33,6 +36,7 @@
             --hero-video-filter: none;
             --index-column-gap: 1rem;
             --index-body-size-scale: 1;
+            --index-year-column-width: 12ch;
         }
         @font-face {
             font-family: 'Acumin Pro';
@@ -418,9 +422,30 @@
         .img-parallax { transform: scale(1.1); }
         
         /* Brutalist Index Grid */
-        .index-row-container:hover .index-text { color: #888; }
+        #index {
+            background: #000;
+            color: #fff;
+        }
+        .index-row-container:hover .index-text { color: inherit; }
         .index-dev-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            align-items: baseline;
             gap: var(--index-column-gap);
+            width: 100%;
+            min-width: 0;
+        }
+        #index .index-head-ref,
+        #index .index-head-client,
+        #index .index-head-type,
+        #index .index-col-ref,
+        #index .index-col-client,
+        #index .index-col-type {
+            justify-self: stretch;
+            text-align: left;
+        }
+        #index .index-col-ref {
+            grid-column: 1 / 2;
         }
         #index .index-head-year,
         #index .index-col-year {
@@ -428,21 +453,83 @@
             word-break: keep-all;
             hyphens: none;
             display: flex;
-            justify-content: flex-end;
-            text-align: right;
+            justify-content: flex-start;
+            text-align: left;
             font-variant-numeric: tabular-nums;
+            align-items: baseline;
+            gap: 0.1em;
+            justify-self: end;
+            width: var(--index-year-column-width);
+            max-width: var(--index-year-column-width);
+        }
+        #index .index-col-year {
+            grid-column: 2 / 3;
+        }
+        #index .index-head-year {
+            min-width: var(--index-year-column-width);
+            width: var(--index-year-column-width);
+            max-width: var(--index-year-column-width);
+            justify-self: end;
+            justify-content: flex-start;
+            text-align: left;
+        }
+        #index .index-year-default,
+        #index .index-year-hover {
+            text-transform: none;
+            white-space: nowrap;
+            display: inline-block;
+            width: max-content;
+            max-width: none;
+        }
+        #index .index-year-hover {
+            font-size: inherit;
+            line-height: inherit;
+            opacity: 0;
+            visibility: hidden;
+            letter-spacing: inherit;
+            pointer-events: none;
+        }
+        #index .index-col-year-open {
+            cursor: pointer;
+            user-select: none;
+            display: inline-grid;
+            align-items: baseline;
+            justify-items: start;
+        }
+        #index .index-col-year-open .index-year-default,
+        #index .index-col-year-open .index-year-hover {
+            grid-area: 1 / 1;
+        }
+        #index .index-col-year-open:hover .index-year-default,
+        #index .index-col-year-open.is-active .index-year-default {
+            opacity: 0;
+            visibility: hidden;
+        }
+        #index .index-col-year-open:hover .index-year-hover,
+        #index .index-col-year-open.is-active .index-year-hover {
+            opacity: 1;
+            visibility: visible;
         }
         @media (min-width: 768px) {
+            #index .index-dev-grid {
+                grid-template-columns: minmax(0, 3.3fr) minmax(0, 4fr) minmax(0, 2.4fr) var(--index-year-column-width);
+                align-items: baseline;
+            }
             #index .index-head-ref,
+            #index .index-col-ref {
+                grid-column: 1 / 2;
+            }
             #index .index-head-client,
+            #index .index-col-client {
+                grid-column: 2 / 3;
+            }
             #index .index-head-type,
+            #index .index-col-type {
+                grid-column: 3 / 4;
+            }
             #index .index-head-year,
-            #index .index-col-ref,
-            #index .index-col-client,
-            #index .index-col-type,
             #index .index-col-year {
-                white-space: nowrap;
-                min-width: 0;
+                grid-column: 4 / 5;
             }
             #index .index-head-ref,
             #index .index-head-client,
@@ -450,8 +537,20 @@
             #index .index-col-ref,
             #index .index-col-client,
             #index .index-col-type {
+                white-space: nowrap;
+                min-width: 0;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+            #index .index-head-year,
+            #index .index-col-year {
+                min-width: 0;
+                width: var(--index-year-column-width);
+                max-width: var(--index-year-column-width);
+                justify-self: end;
+                padding-left: 0;
+                border-left: none;
+                overflow: visible;
             }
         }
         #index-list .index-body-row {
@@ -460,6 +559,46 @@
             font-size: calc(1.16rem * var(--index-body-size-scale));
             text-transform: uppercase;
             letter-spacing: -0.02em;
+        }
+        @media (max-width: 767px) {
+            #index .index-dev-grid {
+                grid-template-columns: minmax(0, 1fr) var(--index-year-column-width);
+                gap: clamp(0.85rem, 3.2vw, 1.25rem);
+            }
+            #index-list .index-body-row {
+                font-size: clamp(2rem, calc(5.35vw * var(--index-body-size-scale)), 2.55rem);
+                letter-spacing: -0.014em;
+            }
+            #index .index-col-ref {
+                min-width: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            #index .index-col-year {
+                width: var(--index-year-column-width);
+                max-width: var(--index-year-column-width);
+                justify-self: end;
+                justify-content: flex-start;
+                text-align: left;
+            }
+        }
+        #contact {
+            background: #000;
+            color: #fff;
+        }
+        #contact a,
+        #contact p {
+            color: #fff;
+        }
+        #contact-logo {
+            width: clamp(42px, 5vw, 70px);
+            height: auto;
+            object-fit: contain;
+            filter: invert(1);
+            opacity: 0.96;
+            user-select: none;
+            pointer-events: none;
         }
         @media (min-width: 768px) and (max-width: 1279px) {
             #index .index-dev-grid {
@@ -471,6 +610,9 @@
             }
         }
         @media (min-width: 1280px) {
+            #index .index-dev-grid {
+                grid-template-columns: minmax(0, 3.8fr) minmax(0, 4.8fr) minmax(0, 2.8fr) var(--index-year-column-width);
+            }
             #index-list .index-body-row {
                 font-size: clamp(1.68rem, calc(2.34vw * var(--index-body-size-scale)), 3.8rem);
             }
@@ -690,6 +832,42 @@
             text-underline-offset: 0.14em;
             text-decoration-thickness: 1px;
         }
+        .hero-contact-block {
+            margin-top: 10px;
+            font-family: var(--font-mono);
+            font-weight: 400 !important;
+            font-size: 0.72em;
+            line-height: 1.45;
+            letter-spacing: 0.02em;
+            text-transform: none;
+        }
+        .hero-contact-block p {
+            margin: 0 0 6px;
+            font-weight: 400 !important;
+        }
+        .hero-contact-block a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: 400 !important;
+        }
+        .hero-contact-block a:hover,
+        .hero-contact-block a:focus-visible {
+            text-decoration: underline;
+            text-underline-offset: 0.14em;
+            text-decoration-thickness: 1px;
+        }
+        .hero-contact-block p:last-child {
+            margin-bottom: 0;
+        }
+        .hero-contact-block p.hero-contact-title {
+            font-family: 'Acumin Pro Semi Condensed', 'Acumin Pro', 'Roboto Condensed', 'Arial Narrow', sans-serif;
+            font-stretch: condensed;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            font-size: 0.94em;
+            color: rgba(0, 0, 0, 0.82);
+            font-weight: 600 !important;
+        }
         @media (max-width: 1023px) {
             .hero-profile-copy-inner {
                 width: min(100%, 44ch);
@@ -725,12 +903,12 @@
             <div class="hero-profile-layout">
                 <div class="hero-profile-media">
                     <div class="hero-profile-media-frame">
-                        <video id="hero-img" class="w-full h-full object-cover" autoplay muted loop playsinline preload="auto">
+                        <video id="hero-img" class="w-full h-full object-cover" autoplay muted loop playsinline preload="auto" poster="./assets/hero-posters/IMG_3550.jpg">
                             <source src="./assets/IMG_3550.mp4" type="video/mp4">
                         </video>
                         <img
                             id="hero-carousel-image"
-                            src=""
+                            src="./assets/hero-posters/IMG_3550.jpg"
                             alt="Image de galerie hero"
                             class="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none select-none"
                             loading="eager"
@@ -753,20 +931,17 @@
                 </div>
                 <div class="hero-profile-copy">
                     <div class="hero-profile-copy-inner">
-                        <p class="hero-profile-name">Sébastien Lacomblez</p>
-                        <p>
-                            Le jardin est une forme artistique totale,<br>à la fois œuvre et milieu.
-                        </p>
-                        <p>
-                            <span class="hero-muted">Le jardin est envisagé comme une forme artistique totale.</span> Un Gesamtkunstwerk : à la fois comme œuvre et milieu.
-                        </p>
-                        <p>
-                            <span class="hero-muted">Chaque projet part du site.</span> Les sols, les microclimats, les plantes en présence façonnent la forme plutôt qu’une image imposée. Les images interviennent comme des opérateurs : elles orientent la conception du jardin, tandis que l’expérience du jardin infléchit en retour leur production.
-                        </p>
-                        <p>
-                            Le jardin est un trait d’union entre le rêve et la réalité.
-                        </p>
-                        <p>SL.</p>
+                        <p>Le jardin est une forme artistique totale, à la fois œuvre et milieu.</p>
+                        <p>Il n’y a pas de différence entre intérieur et extérieur – un aquarium est un jardin.</p>
+                        <p>La question est à la fois technique et esthétique. Elle tient à la fenêtre, à ce point de vue qui ordonne et sélectionne ce qui apparaît.</p>
+                        <p>Le jardin est un objet de désir, au sens où il procède d’une attente et d’une projection. Ce désir s’éprouve au contact du site et s’y ajuste. Les sols, les microclimats, les plantes en présence guident la forme plutôt qu’une image imposée. Les images orientent le projet : elles accompagnent la conception du jardin, tandis que l’expérience du jardin infléchit en retour leur production. Le jardin s’opère à partir d’une boucle de rétroaction qui unit le rêve à la réalité.</p>
+                        <p>Sébastien Lacomblez</p>
+                        <div class="hero-contact-block">
+                            <p class="hero-contact-title">CONTACT</p>
+                            <p><a href="mailto:sebastien.lacomblez@gmail.com">sebastien.lacomblez@gmail.com</a></p>
+                            <p>74 rue du vieux moulin</p>
+                            <p>Charleroi, Belgique</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -901,22 +1076,22 @@
         </section>
 
         <!-- Brutalist Spreadsheet Index Section -->
-        <section class="w-full px-4 md:px-10 pt-12 md:pt-20 pb-8 md:pb-16 bg-white relative" id="index">
+        <section class="w-full px-4 md:px-10 pt-12 md:pt-20 pb-8 md:pb-16 bg-black relative" id="index">
             <!-- Hover Image Reveal Container -->
             <div id="index-hover-img" class="fixed top-0 left-0 w-[60vw] md:w-[25vw] aspect-[4/5] pointer-events-none z-30 opacity-0 overflow-hidden hidden md:block">
                 <img id="index-img-target" src="" class="w-full h-full object-cover scale-110 transition-transform duration-700" alt="Aperçu">
             </div>
 
             <!-- Table Header -->
-            <div class="hidden md:grid grid-cols-12 index-dev-grid font-mono-label text-[0.65rem] text-black mb-4 px-2 gs-reveal">
-                <div class="col-span-3 lg:col-span-4 index-head-ref">Reference</div>
-                <div class="col-span-4 lg:col-span-5 index-head-client">Client</div>
-                <div class="col-span-3 lg:col-span-2 index-head-type">Typologie</div>
-                <div class="col-span-2 lg:col-span-1 text-right index-head-year">Annee</div>
+            <div class="hidden md:grid index-dev-grid font-mono-label text-[0.65rem] text-white mb-4 gs-reveal">
+                <div class="index-head-ref">Reference</div>
+                <div class="index-head-client">Client</div>
+                <div class="index-head-type">Typologie</div>
+                <div class="index-head-year">Annee</div>
             </div>
 
             <!-- The List (Zero padding/margins to mimic text block) -->
-            <div class="flex flex-col w-full relative group/index text-black gs-reveal" id="index-list">
+            <div class="flex flex-col w-full relative group/index text-white gs-reveal" id="index-list">
                 <!-- Injecting index rows -->
                 <script>
                     const indexImagePool = [
@@ -972,8 +1147,25 @@
                     };
                     const formatYear = (value) => {
                         const raw = String(value || '').trim();
-                        if (!raw) return '';
-                        return raw.replace(/\s*([\-–—])\s*$/, '$1en cours');
+                        if (!raw) return { display: '', hover: '', isOpen: false };
+                        const openMatch = raw.match(/^(\d{4})\s*[\-–—]\s*$/);
+                        if (openMatch) {
+                            const startYear = openMatch[1];
+                            return {
+                                display: `${startYear}→`,
+                                hover: 'en cours',
+                                isOpen: true
+                            };
+                        }
+                        const closedRangeMatch = raw.match(/^(\d{4})\s*[\-–—]\s*(\d{4})$/);
+                        if (closedRangeMatch) {
+                            return {
+                                display: `${closedRangeMatch[1]}—${closedRangeMatch[2]}`,
+                                hover: '',
+                                isOpen: false
+                            };
+                        }
+                        return { display: raw, hover: '', isOpen: false };
                     };
                     const indexData = [
                         { name: "Les Formes Vides", client: "Musee Horta Bruxelles", type: "exposition", year: "2026" },
@@ -1000,40 +1192,66 @@
                         { name: "OPTIMUM PARK™", client: "BPS22 Charleroi", type: "performance", year: "2013" },
                         { name: "The Far Future is Nature", client: "Tetem Enschede", type: "exposition", year: "2012" },
                         { name: "Animals", client: "Fondation Verbeke Anvers", type: "exposition", year: "2011" }
-                    ].map((item, index) => ({
-                        ...item,
-                        client: formatClient(item.client),
-                        type: formatTypology(item.type),
-                        year: formatYear(item.year),
-                        img: indexImagePool[index % indexImagePool.length]
-                    }));
+                    ].map((item, index) => {
+                        const formattedYear = formatYear(item.year);
+                        return {
+                            ...item,
+                            client: formatClient(item.client),
+                            type: formatTypology(item.type),
+                            yearDisplay: formattedYear.display,
+                            yearHover: formattedYear.hover,
+                            isOpenYear: formattedYear.isOpen,
+                            img: indexImagePool[index % indexImagePool.length]
+                        };
+                    });
                     
                     const listContainer = document.getElementById('index-list');
                     indexData.forEach(item => {
                         const row = document.createElement('div');
-                        row.className = 'index-row-container index-body-row index-dev-grid grid grid-cols-2 md:grid-cols-12 leading-[1.05] py-1 cursor-target transition-all duration-300';
+                        row.className = 'index-row-container index-body-row index-dev-grid leading-[1.12] py-1 cursor-target transition-all duration-300';
                         row.setAttribute('data-img', item.img);
+                        const yearOpenClass = item.isOpenYear ? ' index-col-year-open' : '';
+                        const yearCellAttrs = item.isOpenYear ? ' tabindex="0" role="button" aria-label="Afficher en cours"' : '';
+                        const yearHtml = item.isOpenYear
+                            ? `<span class="index-year-default">${item.yearDisplay}</span><span class="index-year-hover">${item.yearHover}</span>`
+                            : `<span class="index-year-default">${item.yearDisplay}</span>`;
                         row.innerHTML = `
-                            <div class="col-span-1 md:col-span-3 lg:col-span-4 index-text index-col-ref transition-colors duration-300">${item.name}</div>
-                            <div class="hidden md:block md:col-span-4 lg:col-span-5 index-text index-col-client transition-colors duration-300">${item.client}</div>
-                            <div class="hidden md:block md:col-span-3 lg:col-span-2 index-text index-col-type transition-colors duration-300">${item.type}</div>
-                            <div class="col-span-1 md:col-span-2 lg:col-span-1 text-right index-text index-col-year transition-colors duration-300">${item.year}</div>
+                            <div class="index-text index-col-ref transition-colors duration-300">${item.name}</div>
+                            <div class="hidden md:block index-text index-col-client transition-colors duration-300">${item.client}</div>
+                            <div class="hidden md:block index-text index-col-type transition-colors duration-300">${item.type}</div>
+                            <div class="index-text index-col-year transition-colors duration-300${yearOpenClass}"${yearCellAttrs}>${yearHtml}</div>
                         `;
                         listContainer.appendChild(row);
                     });
+                    const openYearCells = listContainer.querySelectorAll('.index-col-year-open');
+                    openYearCells.forEach((cell) => {
+                        const toggleActiveState = () => {
+                            cell.classList.toggle('is-active');
+                        };
+                        cell.addEventListener('click', (event) => {
+                            event.stopPropagation();
+                            toggleActiveState();
+                        });
+                        cell.addEventListener('keydown', (event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                toggleActiveState();
+                            }
+                        });
+                    });
+                    document.addEventListener('click', () => {
+                        openYearCells.forEach((cell) => cell.classList.remove('is-active'));
+                    });
+
+                    const syncIndexYearColumnWidth = () => {};
+                    window.syncIndexYearColumnWidth = syncIndexYearColumnWidth;
                 </script>
             </div>
         </section>
 
         <!-- Minimal Contact Footer -->
-        <footer class="w-full min-h-[36vh] flex flex-col items-center justify-center bg-white relative z-10 px-6 py-12 md:py-16" id="contact">
-            <a href="mailto:sebastien.lacomblez@gmail.com" id="footer-contact-link" class="font-serif text-[7vw] md:text-[2.4vw] leading-none tracking-tight text-[#222] hover:opacity-70 transition-opacity duration-500 cursor-target text-center">
-                sebastien.lacomblez@gmail.com
-            </a>
-            <p class="font-serif text-[7vw] md:text-[2.4vw] leading-none tracking-tight text-[#222] text-center mt-3">
-                74 rue du vieux moulin<br>
-                Charleroi, Belgique
-            </p>
+        <footer class="w-full min-h-[36vh] flex flex-col items-center justify-center bg-black relative z-10 px-6 py-12 md:py-16" id="contact">
+            <img id="contact-logo" src="./assets/footer-logo.png" alt="SL logo">
         </footer>
     </div>
 
@@ -1113,6 +1331,50 @@
             const heroMediaNext = document.getElementById('hero-media-next');
             if (heroVideoElement && heroCarouselImage && heroMediaPrev && heroMediaNext) {
                 const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                const importedHeroMediaSlides = [
+                    { type: 'video', src: './assets/hero-videos-import/IMG_0629.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_0696.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_0704.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_1106.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_1945.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_1946.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_2356.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_2372.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_2373.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_2976.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_2980.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_3075.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_3511.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_8795.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/IMG_8983.mp4' },
+                    { type: 'video', src: './assets/hero-videos-import/att.8y4Q3K6xFWOzj8j76ziBuaKLQNtX-9hF5anauy7EMkk.mp4' },
+                    { type: 'image', src: './assets/hero-slides-import/119218116_10158741090577427_4365780737670018904_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/41713009_10156762613762427_8563141263157624832_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/468073850_10162072922402427_99767754275803057_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/486449423_10162541955017427_2414681062512265401_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/504893535_10162836191132427_1734593698352446307_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/515011134_10162975387702427_7142728713788721698_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/515506596_10162980847342427_1334513657735384162_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/515586459_10162979781737427_5452003914958616739_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/515888561_10163011670307427_6133182908584422045_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/516098124_10163006968012427_5723409683915744408_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/516449644_10163016586462427_6217177275573126736_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/516583624_10163009530542427_6196815238016289310_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/516656974_10163006110117427_7085380787486000160_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/516741594_10163006966222427_5299629494447075809_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/516750306_10163007773462427_8751516947852563881_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/517582010_10163009530757427_2867957712174738684_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/558061877_10163405244657427_4685006737205248386_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/56178D6B-44A0-43F3-A49E-B6075FF8976B.JPG' },
+                    { type: 'image', src: './assets/hero-slides-import/95997325_10158374371797427_5984534772284653568_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/99133572_10158424356302427_6675056709074944000_n.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/Antonello_da_Messina_-_St_Jerome_in_his_study_-_National_Gallery_London.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/IMG_1614.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/IMG_3375.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/IMG_3375_2.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/IMG_3583.jpg' },
+                    { type: 'image', src: './assets/hero-slides-import/IMG_9003.jpg' }
+                ];
                 const heroMediaSlides = [
                     { type: 'video', src: './assets/IMG_3550.mp4' },
                     { type: 'video', src: './assets/IMG_3204.mp4' },
@@ -1141,7 +1403,8 @@
                     { type: 'image', src: './assets/hero-slides/slide-extra-16.jpg' },
                     { type: 'image', src: './assets/hero-slides/slide-extra-17.jpg' },
                     { type: 'image', src: './assets/hero-slides/slide-extra-18.jpg' },
-                    { type: 'image', src: './assets/hero-slides/slide-extra-19.jpg' }
+                    { type: 'image', src: './assets/hero-slides/slide-extra-19.jpg' },
+                    ...importedHeroMediaSlides
                 ];
                 let activeHeroMediaSlide = 0;
                 let activeHeroVideoSrc = '';
@@ -1151,12 +1414,31 @@
                 const heroOverlayFadeMs = 260;
                 const heroManualPauseDurationMs = 10000;
                 let heroManualPauseUntil = 0;
+                const minImageSlidesBetweenVideos = 4;
+                let imageSlidesSinceLastVideo = minImageSlidesBetweenVideos;
                 const heroImagePreloadCache = new Map();
+                let activeHeroMediaObjectPosition = 'center center';
                 const heroVideoPosterMap = {
                     './assets/IMG_3550.mp4': './assets/hero-posters/IMG_3550.jpg',
                     './assets/IMG_3204.mp4': './assets/hero-posters/IMG_3204.jpg',
                     './assets/IMG_3523.mp4': './assets/hero-posters/IMG_3523.jpg',
-                    './assets/IMG_3373.mp4': './assets/hero-posters/IMG_3373.jpg'
+                    './assets/IMG_3373.mp4': './assets/hero-posters/IMG_3373.jpg',
+                    './assets/hero-videos-import/IMG_0629.mp4': './assets/hero-posters-import/IMG_0629.jpg',
+                    './assets/hero-videos-import/IMG_0696.mp4': './assets/hero-posters-import/IMG_0696.jpg',
+                    './assets/hero-videos-import/IMG_0704.mp4': './assets/hero-posters-import/IMG_0704.jpg',
+                    './assets/hero-videos-import/IMG_1106.mp4': './assets/hero-posters-import/IMG_1106.jpg',
+                    './assets/hero-videos-import/IMG_1945.mp4': './assets/hero-posters-import/IMG_1945.jpg',
+                    './assets/hero-videos-import/IMG_1946.mp4': './assets/hero-posters-import/IMG_1946.jpg',
+                    './assets/hero-videos-import/IMG_2356.mp4': './assets/hero-posters-import/IMG_2356.jpg',
+                    './assets/hero-videos-import/IMG_2372.mp4': './assets/hero-posters-import/IMG_2372.jpg',
+                    './assets/hero-videos-import/IMG_2373.mp4': './assets/hero-posters-import/IMG_2373.jpg',
+                    './assets/hero-videos-import/IMG_2976.mp4': './assets/hero-posters-import/IMG_2976.jpg',
+                    './assets/hero-videos-import/IMG_2980.mp4': './assets/hero-posters-import/IMG_2980.jpg',
+                    './assets/hero-videos-import/IMG_3075.mp4': './assets/hero-posters-import/IMG_3075.jpg',
+                    './assets/hero-videos-import/IMG_3511.mp4': './assets/hero-posters-import/IMG_3511.jpg',
+                    './assets/hero-videos-import/IMG_8795.mp4': './assets/hero-posters-import/IMG_8795.jpg',
+                    './assets/hero-videos-import/IMG_8983.mp4': './assets/hero-posters-import/IMG_8983.jpg',
+                    './assets/hero-videos-import/att.8y4Q3K6xFWOzj8j76ziBuaKLQNtX-9hF5anauy7EMkk.mp4': './assets/hero-posters-import/att.8y4Q3K6xFWOzj8j76ziBuaKLQNtX-9hF5anauy7EMkk.jpg'
                 };
                 const heroVideoSlideIndexes = heroMediaSlides
                     .map((slide, index) => (slide.type === 'video' ? index : -1))
@@ -1183,15 +1465,26 @@
                     if (!shuffledHeroMediaQueue.length) {
                         buildShuffledQueue(activeHeroMediaSlide);
                     }
-                    const isDisallowedVideoCandidate = (index) => {
-                        if (!hasMultipleVideoSlides || lastShownVideoSlide === null) return false;
+                    const isDisallowedVideoCandidate = (index, enforceImageGap) => {
                         const candidate = heroMediaSlides[index];
-                        return candidate && candidate.type === 'video' && index === lastShownVideoSlide;
+                        if (!candidate || candidate.type !== 'video') return false;
+                        if (enforceImageGap && imageSlidesSinceLastVideo < minImageSlidesBetweenVideos) return true;
+                        if (!hasMultipleVideoSlides || lastShownVideoSlide === null) return false;
+                        return index === lastShownVideoSlide;
                     };
-                    let nextQueuePosition = shuffledHeroMediaQueue.findIndex((index) => !isDisallowedVideoCandidate(index));
+                    const findNextQueuePosition = (enforceImageGap) =>
+                        shuffledHeroMediaQueue.findIndex((index) => !isDisallowedVideoCandidate(index, enforceImageGap));
+                    let nextQueuePosition = findNextQueuePosition(true);
                     if (nextQueuePosition < 0) {
                         buildShuffledQueue(activeHeroMediaSlide);
-                        nextQueuePosition = shuffledHeroMediaQueue.findIndex((index) => !isDisallowedVideoCandidate(index));
+                        nextQueuePosition = findNextQueuePosition(true);
+                    }
+                    if (nextQueuePosition < 0) {
+                        nextQueuePosition = findNextQueuePosition(false);
+                    }
+                    if (nextQueuePosition < 0) {
+                        buildShuffledQueue(activeHeroMediaSlide);
+                        nextQueuePosition = findNextQueuePosition(false);
                     }
                     if (nextQueuePosition < 0) return activeHeroMediaSlide;
                     const [nextIndex] = shuffledHeroMediaQueue.splice(nextQueuePosition, 1);
@@ -1248,12 +1541,39 @@
                     heroVideoElement.load();
                     return true;
                 };
+                const enforceHeroVideoCoverLayout = () => {
+                    heroVideoElement.style.position = 'absolute';
+                    heroVideoElement.style.inset = '0';
+                    heroVideoElement.style.objectFit = 'cover';
+                    heroVideoElement.style.objectPosition = activeHeroMediaObjectPosition;
+                    heroVideoElement.style.maxWidth = 'none';
+                    heroVideoElement.style.maxHeight = 'none';
+                    heroVideoElement.style.width = '100%';
+                    heroVideoElement.style.height = '100%';
+                    heroVideoElement.style.removeProperty('min-width');
+                    heroVideoElement.style.removeProperty('min-height');
+                    heroVideoElement.style.removeProperty('margin');
+                    if (isSafariBrowser) {
+                        // Keep Safari compositing on GPU while preserving strict cover sizing.
+                        heroVideoElement.style.webkitBackfaceVisibility = 'hidden';
+                        heroVideoElement.style.backfaceVisibility = 'hidden';
+                        heroVideoElement.style.webkitTransform = 'translate3d(0,0,0)';
+                        heroVideoElement.style.transform = 'translate3d(0,0,0)';
+                    } else {
+                        heroVideoElement.style.removeProperty('-webkit-backface-visibility');
+                        heroVideoElement.style.removeProperty('backface-visibility');
+                        heroVideoElement.style.removeProperty('-webkit-transform');
+                        heroVideoElement.style.removeProperty('transform');
+                    }
+                };
                 const applySafariVideoRenderFix = () => {
+                    enforceHeroVideoCoverLayout();
                     if (!isSafariBrowser) return;
-                    // Safari can occasionally keep a stale video layer after source swaps.
-                    heroVideoElement.style.display = 'none';
+                    // Force a repaint without toggling display, which can break sizing on Safari.
+                    const previousOpacity = heroVideoElement.style.opacity;
+                    heroVideoElement.style.opacity = '0.999';
                     void heroVideoElement.offsetHeight;
-                    heroVideoElement.style.display = 'block';
+                    heroVideoElement.style.opacity = previousOpacity || '1';
                 };
 
                 const applyHeroMediaSlide = (nextIndex) => {
@@ -1263,11 +1583,17 @@
                     const previousSlide = heroMediaSlides[activeHeroMediaSlide];
                     activeHeroMediaSlide = normalized;
                     const slide = heroMediaSlides[normalized];
+                    const useTopAnchorForImportedMedia =
+                        slide.src.includes('/hero-videos-import/') || slide.src.includes('/hero-slides-import/');
+                    activeHeroMediaObjectPosition = useTopAnchorForImportedMedia ? 'center top' : 'center center';
+                    heroCarouselImage.style.objectPosition = activeHeroMediaObjectPosition;
                     if (slide.type === 'video') {
+                        imageSlidesSinceLastVideo = 0;
                         lastShownVideoSlide = normalized;
                         const sourceWillChange = activeHeroVideoSrc !== slide.src;
-                        if (sourceWillChange) {
-                            if (previousSlide && previousSlide.type === 'image') {
+                        const needsPosterFallback = sourceWillChange || heroVideoElement.readyState < 2;
+                        if (needsPosterFallback) {
+                            if (sourceWillChange && previousSlide && previousSlide.type === 'image') {
                                 // Keep current image visible while next video buffers.
                                 heroCarouselImage.style.visibility = 'visible';
                                 heroCarouselImage.style.opacity = '1';
@@ -1279,8 +1605,7 @@
                         const sourceChanged = setHeroVideoSource(slide.src);
                         const revealLoadedVideo = () => {
                             if (activeLoadToken !== heroVideoLoadToken) return;
-                            heroVideoElement.style.objectFit = 'cover';
-                            heroVideoElement.style.objectPosition = 'center center';
+                            enforceHeroVideoCoverLayout();
                             applySafariVideoRenderFix();
                             requestAnimationFrame(() => {
                                 if (activeLoadToken !== heroVideoLoadToken) return;
@@ -1291,7 +1616,12 @@
                             });
                         };
                         if (!sourceChanged) {
-                            revealLoadedVideo();
+                            if (heroVideoElement.readyState >= 2) {
+                                revealLoadedVideo();
+                            } else {
+                                heroVideoElement.addEventListener('loadeddata', revealLoadedVideo, { once: true });
+                                heroVideoElement.addEventListener('error', revealLoadedVideo, { once: true });
+                            }
                         } else {
                             heroVideoElement.addEventListener('loadeddata', revealLoadedVideo, { once: true });
                             heroVideoElement.addEventListener('error', revealLoadedVideo, { once: true });
@@ -1299,6 +1629,7 @@
                         return;
                     }
 
+                    imageSlidesSinceLastVideo = Math.min(minImageSlidesBetweenVideos, imageSlidesSinceLastVideo + 1);
                     const activeLoadToken = ++heroVideoLoadToken;
                     preloadImageSlide(slide.src).catch(() => null).finally(() => {
                         if (activeLoadToken !== heroVideoLoadToken) return;
@@ -1352,6 +1683,10 @@
                     scheduleNextRandomHeroSlide();
                 });
                 window.addEventListener('resize', applySafariVideoRenderFix);
+                heroVideoElement.addEventListener('loadedmetadata', applySafariVideoRenderFix);
+                heroVideoElement.addEventListener('loadeddata', applySafariVideoRenderFix);
+                heroVideoElement.addEventListener('canplay', applySafariVideoRenderFix);
+                heroVideoElement.addEventListener('playing', applySafariVideoRenderFix);
                 heroMediaSlides
                     .filter((slide) => slide.type === 'image')
                     .forEach((slide) => {
@@ -1362,6 +1697,7 @@
                 });
 
                 // Keep first visible media as the looped video, per spec.
+                enforceHeroVideoCoverLayout();
                 applyHeroMediaSlide(0);
                 scheduleNextRandomHeroSlide();
             }
@@ -1426,6 +1762,19 @@
             const hoverImgTarget = document.getElementById('index-img-target');
 
             if(hoverImgContainer && hoverImgTarget && window.innerWidth > 768) {
+                const hoverImagePreloadSet = new Set();
+                const preloadIndexHoverImage = (src) => {
+                    if (!src || hoverImagePreloadSet.has(src)) return;
+                    hoverImagePreloadSet.add(src);
+                    const img = new Image();
+                    img.decoding = 'async';
+                    img.src = src;
+                };
+                const initialHoverPreloads = Array.from(indexRows)
+                    .map((row) => row.getAttribute('data-img'))
+                    .filter(Boolean)
+                    .slice(0, 10);
+                initialHoverPreloads.forEach(preloadIndexHoverImage);
                 const centerHoverImage = () => {
                     const centerX = (window.innerWidth - hoverImgContainer.offsetWidth) / 2;
                     const centerY = (window.innerHeight - hoverImgContainer.offsetHeight) / 2;
@@ -1437,6 +1786,7 @@
                 indexRows.forEach(row => {
                     row.addEventListener('mouseenter', (e) => {
                         const imgSrc = row.getAttribute('data-img');
+                        preloadIndexHoverImage(imgSrc);
                         if(hoverImgTarget.src !== imgSrc) {
                             // Slight zoom effect on change
                             gsap.fromTo(hoverImgTarget, {scale: 1.2}, {scale: 1, duration: 0.7, ease: "power2.out"});
@@ -2489,6 +2839,9 @@
                     indexControlsValue.textContent = `Actuel: ${caseLabel} • écart ${normalizedGap.toFixed(2)} • taille ${normalizedScale.toFixed(2)}`;
                     localStorage.setItem('devIndexColumnGap', String(normalizedGap));
                     localStorage.setItem('devIndexBodyScale', String(normalizedScale));
+                    if (typeof window.syncIndexYearColumnWidth === 'function') {
+                        window.syncIndexYearColumnWidth();
+                    }
                 };
                 const detectDevContext = () => {
                     if (!indexSection) return 'hero';
