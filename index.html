@@ -12,6 +12,7 @@
     <link rel="preload" as="image" href="./assets/hero-scroll/scene-1.webp" type="image/webp" fetchpriority="high">
     <link rel="preload" as="image" href="./assets/hero-scroll/scene-1.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500;600;700&family=Cormorant:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Cormorant+Infant:wght@300;400;500;600;700&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Bodoni:wght@400;500;600;700&family=Newsreader:wght@400;500;600;700&family=Noto+Serif+Display:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Source+Serif+4:wght@300;400;500;600;700&family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -21,11 +22,11 @@
             --font-serif: 'DM Serif Display', serif; 
             --font-sans: 'Acumin Pro', sans-serif; 
             --font-mono: 'IBM Plex Mono', monospace;
-            --hero-title-size-mobile: 7vw;
-            --hero-title-size-desktop: 4.3vw;
-            --hero-title-size-fluid: 7vw;
-            --hero-title-line-height: 0.82;
-            --hero-title-letter-spacing: 0.025em;
+            --hero-title-size-mobile: 18vw;
+            --hero-title-size-desktop: 14vw;
+            --hero-title-size-fluid: 18vw;
+            --hero-title-line-height: 0.74;
+            --hero-title-letter-spacing: -0.018em;
             --statement-title-size-mobile: 8.4vw;
             --statement-title-size-desktop: 5.3vw;
             --statement-title-size-fluid: 8.4vw;
@@ -71,7 +72,7 @@
         @font-face {
             font-family: 'Acumin Pro';
             src: url('./assets/fonts/AcuminPro-Medium.ttf') format('truetype');
-            font-weight: 500;
+            font-weight: 600;
             font-style: normal;
             font-display: swap;
         }
@@ -302,8 +303,20 @@
             mix-blend-mode: normal;
             color: #111111 !important;
         }
+        #hero-img,
+        #hero-carousel-image,
+        #hero-scroll-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            object-position: center center;
+        }
         #hero-img {
             filter: var(--hero-video-filter);
+            background: #000;
             transition: opacity 0.45s ease;
         }
         .hero-scroll-layer {
@@ -315,6 +328,7 @@
             transition: none !important;
         }
         #hero-title-wrap {
+            margin-top: auto;
             transition: filter 0.24s ease, opacity 0.24s ease;
             will-change: filter, opacity;
         }
@@ -322,14 +336,34 @@
             font-size: var(--hero-title-size-mobile);
             line-height: var(--hero-title-line-height);
             letter-spacing: var(--hero-title-letter-spacing);
-            mix-blend-mode: difference;
+            mix-blend-mode: normal;
+            color: #070707;
+            text-transform: lowercase;
             transition: color 0.22s ease, text-shadow 0.22s ease, filter 0.22s ease, opacity 0.22s ease;
         }
         .hero-title-word {
             white-space: nowrap;
         }
+        .hero-meta-hidden {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            margin: -1px !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            clip: rect(0 0 0 0) !important;
+            clip-path: inset(50%) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+            pointer-events: none !important;
+        }
         #hero-title.hero-color-difference {
-            mix-blend-mode: difference;
+            mix-blend-mode: normal;
+            color: #070707;
+            text-shadow: none;
+            filter: none;
+            opacity: 1;
+            transform: none;
         }
         #hero-title.hero-color-luma-invert,
         #hero-title.hero-color-spectrum-shine,
@@ -388,17 +422,54 @@
         .index-dev-grid {
             gap: var(--index-column-gap);
         }
-        .index-body-row {
-            font-size: calc(1.25rem * var(--index-body-size-scale));
+        #index .index-head-year,
+        #index .index-col-year {
+            white-space: nowrap;
+            word-break: keep-all;
+            hyphens: none;
+            display: flex;
+            justify-content: flex-end;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        @media (min-width: 768px) {
+            #index .index-head-ref,
+            #index .index-head-client,
+            #index .index-head-type,
+            #index .index-head-year,
+            #index .index-col-ref,
+            #index .index-col-client,
+            #index .index-col-type,
+            #index .index-col-year {
+                white-space: nowrap;
+                min-width: 0;
+            }
+            #index .index-head-ref,
+            #index .index-head-client,
+            #index .index-col-ref,
+            #index .index-col-client {
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            #index .index-head-year,
+            #index .index-col-year {
+                border-left: 1px solid rgba(0, 0, 0, 0.22);
+                padding-left: clamp(0.45rem, 0.7vw, 0.85rem);
+            }
+        }
+        #index-list .index-body-row {
+            font-family: 'Acumin Pro Semi Condensed', 'Acumin Pro', sans-serif;
+            font-weight: 550;
+            font-size: calc(1.16rem * var(--index-body-size-scale));
             text-transform: uppercase;
             letter-spacing: -0.02em;
         }
         @media (min-width: 768px) {
-            .index-body-row {
-                font-size: clamp(1.8rem, calc(2.5vw * var(--index-body-size-scale)), 4rem);
+            #index-list .index-body-row {
+                font-size: clamp(1.68rem, calc(2.34vw * var(--index-body-size-scale)), 3.8rem);
             }
         }
-        body.index-case-normalcaps .index-body-row {
+        body.index-case-normalcaps #index-list .index-body-row {
             text-transform: none;
             font-variant-caps: normal;
             letter-spacing: 0.005em;
@@ -458,11 +529,13 @@
             letter-spacing: 0;
         }
         .statement-title {
-            font-size: var(--statement-title-size-mobile);
-            line-height: 0.86;
-            letter-spacing: var(--hero-title-letter-spacing);
-            color: #fff;
-            text-shadow: 0 1px 10px rgba(0, 0, 0, 0.28);
+            font-family: 'Acumin Pro Semi Condensed', 'Acumin Pro', sans-serif !important;
+            font-size: clamp(1.1rem, 3.2vw, 4rem);
+            line-height: 0.95;
+            letter-spacing: -0.012em;
+            color: #0a0a0a;
+            text-shadow: none;
+            max-width: min(1700px, 100%);
             transition: filter 0.24s ease, opacity 0.24s ease, transform 0.24s ease;
             will-change: filter, opacity, transform;
         }
@@ -470,78 +543,249 @@
             #hero-title {
                 font-size: var(--hero-title-size-desktop);
             }
-            .statement-title {
-                font-size: var(--statement-title-size-desktop);
+        }
+        .hero-profile-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 100svh;
+            background: #ffffff;
+        }
+        @media (min-width: 1024px) {
+            .hero-profile-layout {
+                grid-template-columns: minmax(0, 40.82%) minmax(0, 59.18%);
+                min-height: 100vh;
+            }
+        }
+        .hero-profile-media {
+            position: relative;
+            min-height: 58svh;
+            background: #ffffff;
+        }
+        @media (min-width: 1024px) {
+            .hero-profile-media {
+                position: sticky;
+                top: 0;
+                min-height: 100vh;
+                height: 100vh;
+            }
+        }
+        .hero-profile-media-frame {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+        #hero-carousel-image {
+            z-index: 2;
+            transition: opacity 0.26s ease;
+        }
+        .hero-media-nav {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        .hero-profile-media-frame:hover .hero-media-nav,
+        .hero-profile-media-frame:focus-within .hero-media-nav {
+            opacity: 1;
+        }
+        .hero-media-arrow {
+            pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            background: rgba(255, 255, 255, 0.92);
+            width: clamp(12px, 1.2vw, 18px);
+            height: clamp(12px, 1.2vw, 18px);
+            border-radius: 999px;
+            color: transparent;
+            font-size: 0;
+            cursor: pointer;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+            padding: 0;
+            user-select: none;
+        }
+        .hero-media-arrow:focus-visible {
+            outline: 1px solid rgba(255, 255, 255, 0.95);
+            outline-offset: 2px;
+        }
+        @media (hover: none) {
+            .hero-media-nav {
+                opacity: 1;
+            }
+        }
+        .hero-profile-copy {
+            padding: 18px 18px 24px;
+            background: #ffffff;
+            border-left: 1px solid #ececec;
+            color: #111;
+        }
+        @media (min-width: 1024px) {
+            .hero-profile-copy {
+                padding: 74px 56px 48px 72px;
+            }
+        }
+        .hero-profile-copy-inner {
+            width: min(100%, 44ch);
+            max-width: 44ch;
+            font-family: 'Acumin Pro Semi Condensed', 'Acumin Pro', 'Roboto Condensed', 'Arial Narrow', sans-serif;
+            font-stretch: condensed;
+            font-weight: 600 !important;
+            font-size: 19px;
+            line-height: 22.99px;
+            letter-spacing: -0.003em;
+            color: #171717;
+        }
+        .hero-profile-copy-inner * {
+            font-weight: 600 !important;
+        }
+        .hero-profile-copy-inner p {
+            margin: 0 0 24px;
+        }
+        .hero-profile-name {
+            margin-bottom: 6px !important;
+            font-weight: 600 !important;
+        }
+        .hero-profile-section {
+            margin: 28px 0 12px !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.01em;
+        }
+        .hero-muted {
+            color: rgba(0, 0, 0, 0.45);
+        }
+        .hero-profile-list {
+            margin: 0 0 28px;
+            padding: 0;
+            list-style: none;
+        }
+        .hero-profile-list li {
+            margin: 0 0 3px;
+        }
+        .hero-profile-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin-top: 8px !important;
+            font-size: 19px;
+            line-height: 22.99px;
+            letter-spacing: -0.003em;
+        }
+        .hero-profile-links a {
+            text-decoration: underline;
+            text-underline-offset: 0.14em;
+            text-decoration-thickness: 1px;
+        }
+        @media (max-width: 1023px) {
+            .hero-profile-copy-inner {
+                width: min(100%, 44ch);
+                font-size: clamp(1.03rem, 4.2vw, 1.18rem);
+                line-height: 1.22;
+            }
+            .hero-profile-links {
+                font-size: inherit;
+                line-height: inherit;
             }
         }
         .hero-statement-overlay {
             position: absolute;
-            inset-inline: 0;
-            bottom: clamp(0.9rem, 8vh, 6.2rem);
+            inset-inline: clamp(0.9rem, 2.2vw, 2rem);
+            top: clamp(0.9rem, 2.4vh, 1.7rem);
             z-index: 20;
             display: flex;
-            justify-content: center;
-            padding-inline: 0.8rem;
-            pointer-events: none;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.45rem;
+            pointer-events: auto;
         }
     </style>
 </head>
 <body>
-        <div class="min-h-screen bg-white text-black font-sans relative w-full overflow-hidden">
+        <div class="min-h-screen bg-white text-black font-sans relative w-full overflow-x-hidden">
             <!-- Custom Cursor -->
             <div id="cursor"></div>
             <div id="dev-text-inspector" aria-hidden="true"></div>
 
-        <!-- Minimal Navigation -->
-        <nav class="fixed top-0 left-0 w-full p-6 md:p-10 flex justify-between items-start z-50 text-white pointer-events-none">
-            <a href="#" id="nav-brand" class="text-sm md:text-base font-semibold tracking-[0.18em] leading-none pointer-events-auto cursor-target video-aware-text">SSL</a>
-            <div class="text-sm font-medium tracking-widest uppercase flex flex-col items-end gap-1 pointer-events-auto cursor-target">
-                <a href="#work" class="hover:opacity-50 transition-opacity video-aware-text">Works</a>
-                <a href="#index" class="hover:opacity-50 transition-opacity video-aware-text">Index</a>
-                <a href="#contact" class="hover:opacity-50 transition-opacity video-aware-text">Contact</a>
-            </div>
-        </nav>
-
         <!-- Hero Section -->
-        <section class="relative h-[100svh] w-full flex flex-col justify-center p-6 md:p-10 overflow-hidden" id="hero">
-            <div class="absolute inset-0 z-0">
-                <video id="hero-img" class="w-full h-full object-cover scale-110" autoplay muted playsinline preload="auto">
-                    <source src="./assets/hero.mp4" type="video/mp4">
-                </video>
-                <img
-                    id="hero-scroll-img"
-                    src="./assets/hero-scroll/scene-1.webp"
-                    alt="Hero scroll image"
-                    class="hero-scroll-layer absolute inset-0 w-full h-full object-cover scale-110 opacity-0 pointer-events-none select-none"
-                    loading="eager"
-                    decoding="async"
-                    fetchpriority="high"
-                >
+        <section class="relative w-full bg-white" id="hero">
+            <div class="hero-profile-layout">
+                <div class="hero-profile-media">
+                    <div class="hero-profile-media-frame">
+                        <video id="hero-img" class="w-full h-full object-cover" autoplay muted loop playsinline preload="auto">
+                            <source src="./assets/IMG_3550.mp4" type="video/mp4">
+                        </video>
+                        <img
+                            id="hero-carousel-image"
+                            src=""
+                            alt="Image de galerie hero"
+                            class="absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none select-none"
+                            loading="eager"
+                            decoding="async"
+                        >
+                        <img
+                            id="hero-scroll-img"
+                            src="./assets/hero-scroll/scene-1.webp"
+                            alt="Image défilante hero"
+                            class="hero-scroll-layer absolute inset-0 w-full h-full object-cover opacity-0 pointer-events-none select-none"
+                            loading="eager"
+                            decoding="async"
+                            fetchpriority="high"
+                        >
+                        <div class="hero-media-nav" aria-hidden="false">
+                            <button id="hero-media-prev" type="button" class="hero-media-arrow cursor-target" aria-label="Afficher le média précédent"></button>
+                            <button id="hero-media-next" type="button" class="hero-media-arrow cursor-target" aria-label="Afficher le média suivant"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-profile-copy">
+                    <div class="hero-profile-copy-inner">
+                        <p class="hero-profile-name">Sébastien Lacomblez</p>
+                        <p>
+                            Le jardin est une forme artistique totale,<br>à la fois œuvre et milieu.
+                        </p>
+                        <p>
+                            <span class="hero-muted">Le jardin est envisagé comme une forme artistique totale.</span> Un Gesamtkunstwerk : à la fois comme œuvre et milieu.
+                        </p>
+                        <p>
+                            <span class="hero-muted">Chaque projet part du site.</span> Les sols, les microclimats, les plantes en présence façonnent la forme plutôt qu’une image imposée. Les images interviennent comme des opérateurs : elles orientent la conception du jardin, tandis que l’expérience du jardin infléchit en retour leur production.
+                        </p>
+                        <p>
+                            Le jardin est un trait d’union entre le rêve et la réalité.
+                        </p>
+                        <p>SL.</p>
+                    </div>
+                </div>
             </div>
-            <div id="hero-title-wrap" class="relative z-10 w-full text-white">
+            <div id="hero-title-wrap" class="hero-meta-hidden" aria-hidden="true">
                 <h1 id="hero-title" class="font-serif flex flex-col items-center text-center">
-                    <span class="block hero-title-word">studio</span>
                     <span class="block hero-title-word">sébastien</span>
                     <span class="block hero-title-word">lacomblez</span>
                 </h1>
             </div>
-            <div class="hero-statement-overlay">
-                <h2 id="statement-transition-title" class="statement-title font-serif text-center">
-                    <span class="block statement-title-word whitespace-nowrap">Le jardin, lieu où le</span>
-                    <span class="block statement-title-word whitespace-nowrap">rêve touche la terre</span>
+            <div class="hero-statement-overlay hero-meta-hidden" aria-hidden="true">
+                <h2 id="statement-transition-title" class="statement-title text-left">
+                    <span class="block statement-title-word">Studio Sébastien Lacomblez</span>
                 </h2>
             </div>
             <div id="dev-mode-panel" class="hidden fixed top-4 left-4 md:top-6 md:left-6 z-[60] w-[min(92vw,380px)] bg-black/70 text-white border border-white/40 rounded-md p-3 md:p-4 backdrop-blur-sm">
-                <p class="text-[10px] tracking-[0.22em] uppercase text-white/75 mb-2">Dev Mode</p>
+                <p class="text-[10px] tracking-[0.22em] uppercase text-white/75 mb-2">Mode Dev</p>
                 <div id="dev-hero-controls">
-                    <label for="font-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Hero Font</label>
+                    <label for="font-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Police principale</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="font-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="font-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="font-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="font-weight-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Weight</label>
+                    <label for="font-weight-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Graisse</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="font-weight-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="font-weight-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
@@ -549,250 +793,196 @@
                         <button id="font-weight-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
                     <div id="variable-axis-control" class="hidden">
-                        <label for="variable-axis-slider" id="variable-axis-label" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Variable Axis</label>
+                        <label for="variable-axis-slider" id="variable-axis-label" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Axe variable</label>
                         <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
                             <input id="variable-axis-slider" type="range" min="100" max="900" step="10" class="w-full accent-white">
                             <span id="variable-axis-value" class="text-[11px] text-right text-white/80 tabular-nums">100</span>
                         </div>
                     </div>
-                    <label for="hero-background-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Hero Background</label>
+                    <label for="hero-background-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Arrière-plan principal</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="hero-background-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="hero-background-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="hero-background-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="text-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Text Effect</label>
+                    <label for="text-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Effet texte</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="text-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="text-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="text-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="color-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Text Color FX</label>
+                    <label for="color-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">FX couleur texte</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="color-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="color-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="color-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="scroll-title-fx-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Scroll Title FX</label>
+                    <label for="scroll-title-fx-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">FX titre défilement</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="scroll-title-fx-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="scroll-title-fx-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="scroll-title-fx-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="grayscale-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Grayscale</label>
+                    <label for="grayscale-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Niveaux de gris</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="grayscale-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="grayscale-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="grayscale-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="invert-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Invert</label>
+                    <label for="invert-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Inverser</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="invert-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="invert-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="invert-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="cursor-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Mouse Effect</label>
+                    <label for="cursor-effect-picker" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Effet souris</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="cursor-effect-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="cursor-effect-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="cursor-effect-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="hero-size-mobile" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Mobile (vw)</label>
+                    <label for="hero-size-mobile" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Taille mobile (vw)</label>
                     <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
                         <input id="hero-size-mobile" type="range" min="6" max="18" step="0.1" class="w-full accent-white">
                         <span id="hero-size-mobile-value" class="text-[11px] text-right text-white/80 tabular-nums">7.0</span>
                     </div>
-                    <label for="hero-size-desktop" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Size Desktop (vw)</label>
+                    <label for="hero-size-desktop" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Taille bureau (vw)</label>
                     <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
                         <input id="hero-size-desktop" type="range" min="4" max="14" step="0.1" class="w-full accent-white">
                         <span id="hero-size-desktop-value" class="text-[11px] text-right text-white/80 tabular-nums">4.3</span>
                     </div>
-                    <label for="hero-letter-spacing" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Letter Spacing (em)</label>
+                    <label for="hero-letter-spacing" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Espacement des lettres (em)</label>
                     <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
                         <input id="hero-letter-spacing" type="range" min="-0.12" max="0.12" step="0.005" class="w-full accent-white">
                         <span id="hero-letter-spacing-value" class="text-[11px] text-right text-white/80 tabular-nums">+0.025</span>
                     </div>
-                    <label for="hero-line-height" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Line Height</label>
+                    <label for="hero-line-height" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Interligne</label>
                     <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
                         <input id="hero-line-height" type="range" min="0.65" max="1.3" step="0.01" class="w-full accent-white">
                         <span id="hero-line-height-value" class="text-[11px] text-right text-white/80 tabular-nums">0.82</span>
                     </div>
-                    <p id="font-picker-value" class="mt-2 text-[11px] text-white/70">Current: Verdigris MVB Pro Text 700</p>
+                    <p id="font-picker-value" class="mt-2 text-[11px] text-white/70">Actuel: Verdigris MVB Pro Text 700</p>
                 </div>
                 <div id="dev-index-controls" class="hidden">
-                    <label for="index-case-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Index Body Case</label>
+                    <label for="index-case-picker" class="font-mono-label block text-[11px] text-white/90 mb-1">Casse du corps (index)</label>
                     <div class="grid grid-cols-[32px_1fr_32px] gap-2 items-center">
                         <button id="index-case-prev" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">◀</button>
                         <select id="index-case-picker" class="w-full bg-black/60 border border-white/40 rounded px-2 py-1.5 text-sm text-white outline-none">
                         </select>
                         <button id="index-case-next" type="button" class="h-9 border border-white/40 rounded bg-black/55 text-white text-base leading-none">▶</button>
                     </div>
-                    <label for="index-column-gap" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Column Spacing (rem)</label>
+                    <label for="index-column-gap" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Espacement des colonnes (rem)</label>
                     <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
                         <input id="index-column-gap" type="range" min="0.4" max="3.2" step="0.05" class="w-full accent-white">
                         <span id="index-column-gap-value" class="text-[11px] text-right text-white/80 tabular-nums">1.00</span>
                     </div>
-                    <label for="index-body-size-scale" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Body Text Size</label>
+                    <label for="index-body-size-scale" class="font-mono-label block text-[11px] text-white/90 mt-3 mb-1">Taille du corps de texte</label>
                     <div class="grid grid-cols-[1fr_54px] gap-2 items-center">
                         <input id="index-body-size-scale" type="range" min="0.75" max="1.6" step="0.01" class="w-full accent-white">
                         <span id="index-body-size-scale-value" class="text-[11px] text-right text-white/80 tabular-nums">1.00</span>
                     </div>
-                    <p id="index-controls-value" class="mt-2 text-[11px] text-white/70">Current: All Caps • gap 1.00 • size 1.00</p>
+                    <p id="index-controls-value" class="mt-2 text-[11px] text-white/70">Actuel: Majuscules • écart 1.00 • taille 1.00</p>
                 </div>
-                <p class="mt-2 text-[10px] tracking-[0.08em] uppercase text-white/55">Toggle: Ctrl + Shift + D</p>
-            </div>
-        </section>
-
-        <!-- Asymmetric Work Grid -->
-        <section class="w-full px-6 md:px-10 pt-16 md:pt-20 pb-24 md:pb-48 bg-white text-black" id="work">
-            <!-- Statement Section -->
-            <div class="max-w-[1600px] mx-auto mb-24 md:mb-44">
-                <div class="statement-body-copy grid grid-cols-1 md:grid-cols-2 gap-x-12 lg:gap-x-24 gap-y-10 gs-reveal max-w-[1220px] mx-auto">
-                    <div class="space-y-8">
-                        <p>
-                            Entrer dans un jardin, ici, revient d'abord à entrer dans un processus.
-                            Le paysage n'y apparaît pas comme décor, mais comme matière en travail: stratifiée, traversée, instable. Chaque projet s'ouvre par une lecture du site, de ses plans visibles et souterrains, de ses sols, de ses circulations, de ses milieux déjà là. Le paysage n'y est pas seulement tracé. Il s'écrit, avec des plantes, des microclimats, des densités, des temporalités.
-                        </p>
-                        <p>
-                            À l'endroit où se touchent art, architecture et sciences du vivant, la pratique refuse les catégories trop nettes.
-                            Le jardin y devient simultanément construction, biotope, forme sensible. Les compositions végétales se déploient en strates, en rythmes, en intensités saisonnières. Il ne s'agit pas d'imposer une figure, mais de rendre lisibles des dynamiques, d'activer ce qui travaille déjà le lieu.
-                        </p>
-                    </div>
-                    <div class="space-y-8">
-                        <p>
-                            Les jardins conçus par le Studio Sébastien Lacomblez ne sont pas des objets clos.
-                            Ils évoluent, se déplacent, se densifient. Une structure initiale est posée, une palette orientée, une architecture du vivant engagée; puis l'oeuvre se décentre, portée par la croissance, les interactions d'espèces, les cycles.
-                        </p>
-                        <p>
-                            Entre recherche paysagère, laboratoire du vivant et conception spatiale, le studio développe une pratique de précision et d'écoute.
-                            Chaque projet devient un territoire en devenir: une composition ouverte où paysage, écologie et geste artistique se nouent, sans se confondre.
-                        </p>
-                        <p class="pt-1 md:pt-2">
-                            <a href="#contact" class="underline decoration-black decoration-[1px] underline-offset-[0.16em] cursor-target">
-                                Rentrons en contact.
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Work Grid - Asymmetric Layout -->
-            <div class="space-y-10 lg:space-y-64">
-                
-                <!-- Row 1: Large & Offset -->
-                <div class="grid lg:grid-cols-12 gap-10">
-                    <div class="lg:col-span-7 gs-reveal">
-                        <div id="work-link-1" class="work-card block group">
-                            <div class="aspect-[4/5] lg:aspect-[16/9] w-full overflow-hidden">
-                                <img src="./assets/jardin-a6k.jpg" alt="Jardin d'A6K" class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low">
-                            </div>
-                            <div class="mt-6">
-                                <h3 class="text-2xl font-display">Jardin d'A6K</h3>
-                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">Charleroi — 2019</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-4 lg:col-start-9 lg:pt-40 gs-reveal">
-                        <div id="work-link-2" class="work-card block group">
-                            <div class="aspect-square w-full overflow-hidden">
-                                <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900584494-5ba1b7c0/img-04.jpg" alt="Project Two" class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low">
-                            </div>
-                            <div class="mt-6">
-                                <h3 class="text-2xl font-display">Fracture</h3>
-                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">Experimental Film</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Row 2: Overlapping -->
-                <div class="grid gap-10 lg:grid-cols-12 lg:gap-0">
-                    <div class="lg:col-span-5 lg:col-start-2 gs-reveal">
-                        <div id="work-link-3" class="work-card block group">
-                            <div class="aspect-[3/4] w-full overflow-hidden">
-                                <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900586080-03e32c9d/img-11.jpg" alt="Project Three" class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low">
-                            </div>
-                            <div class="mt-6">
-                                <h3 class="text-2xl font-display">Silent Void</h3>
-                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">Editorial Design</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-5 lg:col-start-8 mt-0 lg:-mt-40 gs-reveal">
-                        <div id="work-link-4" class="work-card block group">
-                            <div class="aspect-[4/5] w-full overflow-hidden">
-                                <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588644-398b820c/img-22.jpg" alt="Project Four" class="w-full h-full object-cover" loading="lazy" decoding="async" fetchpriority="low">
-                            </div>
-                            <div class="mt-6">
-                                <h3 class="text-2xl font-display">Kinetic Structure</h3>
-                                <p class="work-card-label font-mono-label text-[10px] opacity-55 mt-1">CGI / Motion</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <p class="mt-2 text-[10px] tracking-[0.08em] uppercase text-white/55">Basculer: Ctrl + Shift + D</p>
             </div>
         </section>
 
         <!-- Brutalist Spreadsheet Index Section -->
-        <section class="w-full px-4 md:px-10 pt-10 md:pt-16 pb-8 md:pb-16 bg-white relative" id="index">
+        <section class="w-full px-4 md:px-10 pt-12 md:pt-20 pb-8 md:pb-16 bg-white relative" id="index">
             <!-- Hover Image Reveal Container -->
             <div id="index-hover-img" class="fixed top-0 left-0 w-[60vw] md:w-[25vw] aspect-[4/5] pointer-events-none z-30 opacity-0 overflow-hidden hidden md:block">
-                <img id="index-img-target" src="" class="w-full h-full object-cover scale-110 transition-transform duration-700" alt="Preview">
+                <img id="index-img-target" src="" class="w-full h-full object-cover scale-110 transition-transform duration-700" alt="Aperçu">
             </div>
 
             <!-- Table Header -->
             <div class="hidden md:grid grid-cols-12 index-dev-grid font-mono-label text-[0.65rem] text-black mb-4 px-2 gs-reveal">
-                <div class="col-span-5">Référence projet</div>
-                <div class="col-span-4">Collaborateur</div>
-                <div class="col-span-2">Typologie</div>
-                <div class="col-span-1 text-right">Année</div>
+                <div class="col-span-4 index-head-ref">Reference</div>
+                <div class="col-span-5 index-head-client">Client</div>
+                <div class="col-span-2 index-head-type">Typologie</div>
+                <div class="col-span-1 text-right index-head-year">Annee</div>
             </div>
 
             <!-- The List (Zero padding/margins to mimic text block) -->
             <div class="flex flex-col w-full relative group/index text-black gs-reveal" id="index-list">
-                <!-- Injecting 20 rows with exact image URLs 16 to 35 -->
+                <!-- Injecting index rows -->
                 <script>
-                    const indexData = [
-                        { name: "Sector Null", client: "Bureau X", type: "Identity", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587266-914e4d8d/img-16.jpg" },
-                        { name: "Prism Collective", client: "Art Basel", type: "Motion", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587503-d998535c/img-17.jpg" },
-                        { name: "Monolith Base", client: "Archi Group", type: "Spatial", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587732-4319a5f2/img-18.jpg" },
-                        { name: "Zenith Finance", client: "FinTech Co", type: "Product", year: "2022", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587961-ef4e1a20/img-19.jpg" },
-                        { name: "Void Cult", client: "LVMH", type: "Editorial", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588183-67a3ef7f/img-20.jpg" },
-                        { name: "Shift Logistics", client: "Global Freight", type: "Brand", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588411-2c806949/img-21.jpg" },
-                        { name: "Opaque Gallery", client: "Art Studio", type: "Web", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588644-398b820c/img-22.jpg" },
-                        { name: "Vertex Data", client: "Data Inc", type: "System", year: "2021", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588881-ff46852f/img-23.jpg" },
-                        { name: "Flux Energy", client: "National Grid", type: "Platform", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589108-d0468bcf/img-24.jpg" },
-                        { name: "Raw Material", client: "Object Dept", type: "3D", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589341-26f27353/img-25.jpg" },
-                        { name: "Grid Lock", client: "Urban Planning", type: "Campaign", year: "2022", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589570-7938fe58/img-26.jpg" },
-                        { name: "Helix Bio", client: "Biotech Lab", type: "Identity", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589797-46dbdc82/img-27.jpg" },
-                        { name: "Static Noise", client: "Warp Records", type: "Cover", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590253-5ebb7f0a/img-29.jpg" },
-                        { name: "Frame Works", client: "Photo Agency", type: "Digital", year: "2021", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590476-d073bbf7/img-30.jpg" },
-                        { name: "Horizon Auto", client: "Polestar", type: "UI", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590706-90ba4881/img-31.jpg" },
-                        { name: "Core Hardware", client: "Tech Inc", type: "Packaging", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590928-4ff33341/img-32.jpg" },
-                        { name: "Echo System", client: "Sound Dept", type: "Web", year: "2022", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900591165-b9613dfe/img-33.jpg" },
-                        { name: "Nexus Net", client: "Telecom", type: "App", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900591643-3a35965f/img-35.jpg" },
-                        { name: "Apex Sports", client: "Nike", type: "Campaign", year: "2023", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587266-914e4d8d/img-16.jpg" },
-                        { name: "Terminus", client: "Real Estate", type: "Brand", year: "2024", img: "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587503-d998535c/img-17.jpg" }
+                    const indexImagePool = [
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587266-914e4d8d/img-16.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587503-d998535c/img-17.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587732-4319a5f2/img-18.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900587961-ef4e1a20/img-19.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588183-67a3ef7f/img-20.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588411-2c806949/img-21.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588644-398b820c/img-22.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900588881-ff46852f/img-23.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589108-d0468bcf/img-24.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589341-26f27353/img-25.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589570-7938fe58/img-26.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900589797-46dbdc82/img-27.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590253-5ebb7f0a/img-29.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590476-d073bbf7/img-30.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590706-90ba4881/img-31.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900590928-4ff33341/img-32.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900591165-b9613dfe/img-33.jpg",
+                        "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/14a0654e-e3ac-4ce2-b825-740077280921/1772900591643-3a35965f/img-35.jpg"
                     ];
+                    const formatTypology = (value) => {
+                        const raw = String(value || '').trim();
+                        if (!raw) return '';
+                        if (raw.toLowerCase() === 'direction artistique') return 'DA';
+                        return raw
+                            .split(/\s+/)
+                            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                            .join(' ');
+                    };
+                    const indexData = [
+                        { name: "Les Formes Vides", client: "Musee Horta Bruxelles", type: "exposition", year: "2026" },
+                        { name: "Jardin de la non-dualite", client: "SSL", type: "jardin", year: "2024–" },
+                        { name: "Les Formes Vides", client: "Arsenal Montreal", type: "exposition", year: "2024" },
+                        { name: "Troppo fiso", client: "Horst Festival Vilvorde", type: "scenographie", year: "2022" },
+                        { name: "La cite d’or", client: "ICA-WB Charleroi", type: "exposition", year: "2021" },
+                        { name: "TERRE Manifeste", client: "Centre Wallonie-Bruxelles Paris", type: "exposition", year: "2021" },
+                        { name: "Nouvelle Ecole de la Forme", client: "ARTS² Mons", type: "formation", year: "2020–" },
+                        { name: "Meta-jardin", client: "Marie Artamonoff Charleroi", type: "jardin", year: "2017–2020" },
+                        { name: "La mort", client: "Urban.brussels Mont des Arts Bruxelles", type: "installation", year: "2019" },
+                        { name: "A6K", client: "Carbonifere Charleroi", type: "jardin", year: "2019" },
+                        { name: "Direction artistique", client: "Charleroi Bouwmeester", type: "direction artistique", year: "2013–2019" },
+                        { name: "Eurotopie", client: "Biennale de Venise", type: "exposition", year: "2018" },
+                        { name: "Eurotopie", client: "BOZAR Bruxelles", type: "exposition", year: "2018" },
+                        { name: "Ars Electronica", client: "Ars Electronica Festival Linz", type: "exposition", year: "2017" },
+                        { name: "Nouveaux Westerns", client: "Musee des beaux-arts de Mons", type: "exposition", year: "2017" },
+                        { name: "OPTIMUM PARK™", client: "Palais de Tokyo Paris", type: "performance", year: "2016" },
+                        { name: "OPTIMUM PARK™", client: "Charleroi Danses Charleroi", type: "performance", year: "2016" },
+                        { name: "BEAF", client: "BOZAR Bruxelles", type: "exposition", year: "2016" },
+                        { name: "BIAN", client: "Arsenal Montreal", type: "exposition", year: "2016" },
+                        { name: "Ex Nihilo Nihil Fit", client: "Ateliers Copens Bruxelles", type: "exposition", year: "2016" },
+                        { name: "BIAN 2014", client: "Musee d’art contemporain Montreal", type: "exposition", year: "2014" },
+                        { name: "OPTIMUM PARK™", client: "BPS22 Charleroi", type: "performance", year: "2013" },
+                        { name: "The Far Future is Nature", client: "Tetem Enschede", type: "exposition", year: "2012" },
+                        { name: "Animals", client: "Fondation Verbeke Anvers", type: "exposition", year: "2011" }
+                    ].map((item, index) => ({
+                        ...item,
+                        type: formatTypology(item.type),
+                        img: indexImagePool[index % indexImagePool.length]
+                    }));
                     
                     const listContainer = document.getElementById('index-list');
                     indexData.forEach(item => {
                         const row = document.createElement('div');
-                        row.className = 'index-row-container index-body-row index-dev-grid grid grid-cols-2 md:grid-cols-12 font-medium leading-[1.05] py-1 cursor-target transition-all duration-300';
+                        row.className = 'index-row-container index-body-row index-dev-grid grid grid-cols-2 md:grid-cols-12 leading-[1.05] py-1 cursor-target transition-all duration-300';
                         row.setAttribute('data-img', item.img);
                         row.innerHTML = `
-                            <div class="col-span-1 md:col-span-5 index-text transition-colors duration-300">${item.name}</div>
-                            <div class="hidden md:block col-span-4 index-text transition-colors duration-300">${item.client}</div>
-                            <div class="hidden md:block col-span-2 index-text transition-colors duration-300">${item.type}</div>
-                            <div class="col-span-1 md:col-span-1 text-right index-text transition-colors duration-300">${item.year}</div>
+                            <div class="col-span-1 md:col-span-4 index-text index-col-ref transition-colors duration-300">${item.name}</div>
+                            <div class="hidden md:block col-span-5 index-text index-col-client transition-colors duration-300">${item.client}</div>
+                            <div class="hidden md:block col-span-2 index-text index-col-type transition-colors duration-300">${item.type}</div>
+                            <div class="col-span-1 md:col-span-1 text-right index-text index-col-year transition-colors duration-300">${item.year}</div>
                         `;
                         listContainer.appendChild(row);
                     });
@@ -805,37 +995,17 @@
             <a href="mailto:sebastien.lacomblez@gmail.com" id="footer-contact-link" class="font-serif text-[7vw] md:text-[2.4vw] leading-none tracking-tight text-[#222] hover:opacity-70 transition-opacity duration-500 cursor-target text-center">
                 sebastien.lacomblez@gmail.com
             </a>
-            <div class="absolute bottom-3 md:bottom-5 left-0 w-full px-6 flex items-center justify-between font-mono-label text-[0.62rem] text-black/75">
-                <a href="#" class="hover:opacity-50 transition-opacity whitespace-nowrap">Terms of Service</a>
-                <a href="#" class="hover:opacity-50 transition-opacity whitespace-nowrap text-center">Cookie Policy</a>
-                <a href="#" class="hover:opacity-50 transition-opacity whitespace-nowrap text-right">Accessibility</a>
-            </div>
+            <p class="font-serif text-[7vw] md:text-[2.4vw] leading-none tracking-tight text-[#222] text-center mt-3">
+                74 rue du vieux moulin<br>
+                Charleroi, Belgique
+            </p>
         </footer>
     </div>
 
     <!-- Interactions Script -->
     <script>
         document.addEventListener("DOMContentLoaded", (event) => {
-            // 1. Initialize Lenis for buttery smooth scrolling
-            if (typeof Lenis !== 'undefined') {
-                const lenis = new Lenis({
-                    duration: 1.2,
-                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                    orientation: 'vertical',
-                    gestureOrientation: 'vertical',
-                    smoothWheel: true,
-                    wheelMultiplier: 1,
-                    smoothTouch: false,
-                    touchMultiplier: 2,
-                    infinite: false,
-                });
-
-                lenis.on('scroll', ScrollTrigger.update);
-                gsap.ticker.add((time) => { lenis.raf(time * 1000) });
-                gsap.ticker.lagSmoothing(0);
-            } else {
-                console.warn('Lenis library not loaded, falling back to native scroll');
-            }
+            // 1. Native scrolling (smooth/inertial drag disabled)
 
             // 2. Custom Magnetic Cursor Logic (Dev-toggleable, default OFF)
             let setCursorEffectState = null;
@@ -880,84 +1050,285 @@
                 document.body.classList.remove('cursor-effect-on');
             }
 
-            // 3. Hero Video Boomerang Playback (forward/backward loop)
+            // 3. Hero Video Loop Playback
             const heroVideoElement = document.getElementById('hero-img');
-            if (heroVideoElement) {
-                heroVideoElement.loop = false;
-                heroVideoElement.removeAttribute('loop');
-
-                let boomerangDirection = 1;
-                let boomerangRafId = null;
-                let lastBoomerangTimestamp = null;
-
-                const stopBoomerang = () => {
-                    if (boomerangRafId !== null) {
-                        cancelAnimationFrame(boomerangRafId);
-                        boomerangRafId = null;
-                    }
-                };
-
-                const boomerangStep = (timestamp) => {
-                    const duration = heroVideoElement.duration;
-                    if (!Number.isFinite(duration) || duration <= 0) {
-                        boomerangRafId = requestAnimationFrame(boomerangStep);
-                        return;
-                    }
-
-                    if (lastBoomerangTimestamp === null) {
-                        lastBoomerangTimestamp = timestamp;
-                        boomerangRafId = requestAnimationFrame(boomerangStep);
-                        return;
-                    }
-
-                    const deltaSeconds = Math.min(0.05, (timestamp - lastBoomerangTimestamp) / 1000);
-                    lastBoomerangTimestamp = timestamp;
-                    const speed = 1;
-                    let nextTime = heroVideoElement.currentTime + (deltaSeconds * speed * boomerangDirection);
-
-                    if (nextTime >= duration) {
-                        nextTime = duration;
-                        boomerangDirection = -1;
-                    } else if (nextTime <= 0) {
-                        nextTime = 0;
-                        boomerangDirection = 1;
-                    }
-
-                    heroVideoElement.currentTime = nextTime;
-                    boomerangRafId = requestAnimationFrame(boomerangStep);
-                };
-
-                const startBoomerang = ({ preserveDirection = false } = {}) => {
-                    if (!preserveDirection) {
-                        boomerangDirection = 1;
-                    }
-                    stopBoomerang();
-                    lastBoomerangTimestamp = null;
-                    heroVideoElement.pause();
-                    boomerangRafId = requestAnimationFrame(boomerangStep);
-                };
-                const primeAndStartBoomerang = () => {
-                    const playPromise = heroVideoElement.play();
-                    if (playPromise && typeof playPromise.then === 'function') {
-                        playPromise.then(() => startBoomerang()).catch(() => startBoomerang());
-                        return;
-                    }
-                    startBoomerang();
-                };
-
-                if (heroVideoElement.readyState >= 1) {
-                    primeAndStartBoomerang();
-                } else {
-                    heroVideoElement.addEventListener('loadedmetadata', () => primeAndStartBoomerang(), { once: true });
+            const playHeroLoopVideo = () => {
+                if (!heroVideoElement) return;
+                heroVideoElement.loop = true;
+                heroVideoElement.setAttribute('loop', '');
+                const playPromise = heroVideoElement.play();
+                if (playPromise && typeof playPromise.catch === 'function') {
+                    playPromise.catch(() => {});
                 }
+            };
+            if (heroVideoElement) {
+                if (heroVideoElement.readyState >= 2) {
+                    playHeroLoopVideo();
+                } else {
+                    heroVideoElement.addEventListener('loadeddata', playHeroLoopVideo, { once: true });
+                }
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) playHeroLoopVideo();
+                });
+            }
 
+            // 3b. Hero Media Carousel (video + stills)
+            const heroCarouselImage = document.getElementById('hero-carousel-image');
+            const heroMediaPrev = document.getElementById('hero-media-prev');
+            const heroMediaNext = document.getElementById('hero-media-next');
+            if (heroVideoElement && heroCarouselImage && heroMediaPrev && heroMediaNext) {
+                const isSafariBrowser = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                const heroMediaSlides = [
+                    { type: 'video', src: './assets/IMG_3550.mp4' },
+                    { type: 'video', src: './assets/IMG_3204.mp4' },
+                    { type: 'video', src: './assets/IMG_3523.mp4' },
+                    { type: 'video', src: './assets/IMG_3373.mp4' },
+                    { type: 'image', src: './assets/hero-slides/slide-0_0-20-2.png' },
+                    { type: 'image', src: './assets/hero-slides/slide-0_0.png' },
+                    { type: 'image', src: './assets/hero-slides/slide-0_1-23.png' },
+                    { type: 'image', src: './assets/hero-slides/slide-0_1-30.png' },
+                    { type: 'image', src: './assets/hero-slides/IMG_3632.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-01.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-02.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-03.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-04.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-05.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-06.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-07.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-08.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-09.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-10.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-11.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-12.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-13.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-14.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-15.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-16.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-17.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-18.jpg' },
+                    { type: 'image', src: './assets/hero-slides/slide-extra-19.jpg' }
+                ];
+                let activeHeroMediaSlide = 0;
+                let activeHeroVideoSrc = '';
+                let heroMediaAutoTimer = null;
+                let shuffledHeroMediaQueue = [];
+                let heroVideoLoadToken = 0;
+                const heroOverlayFadeMs = 260;
+                const heroManualPauseDurationMs = 10000;
+                let heroManualPauseUntil = 0;
+                const heroImagePreloadCache = new Map();
+                const heroVideoPosterMap = {
+                    './assets/IMG_3550.mp4': './assets/hero-posters/IMG_3550.jpg',
+                    './assets/IMG_3204.mp4': './assets/hero-posters/IMG_3204.jpg',
+                    './assets/IMG_3523.mp4': './assets/hero-posters/IMG_3523.jpg',
+                    './assets/IMG_3373.mp4': './assets/hero-posters/IMG_3373.jpg'
+                };
+                const heroVideoSlideIndexes = heroMediaSlides
+                    .map((slide, index) => (slide.type === 'video' ? index : -1))
+                    .filter((index) => index >= 0);
+                const hasMultipleVideoSlides = heroVideoSlideIndexes.length > 1;
+                let lastShownVideoSlide = null;
+                const heroVideoSourceNode = heroVideoElement.querySelector('source');
+                if (heroVideoSourceNode && heroVideoSourceNode.getAttribute('src')) {
+                    activeHeroVideoSrc = heroVideoSourceNode.getAttribute('src');
+                }
+                const getSlideDurationMs = (slide) => (slide && slide.type === 'video' ? 3000 : 100);
+                const buildShuffledQueue = (excludeIndex) => {
+                    const indexes = heroMediaSlides
+                        .map((_, idx) => idx)
+                        .filter((idx) => idx !== excludeIndex);
+                    for (let i = indexes.length - 1; i > 0; i -= 1) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+                    }
+                    shuffledHeroMediaQueue = indexes;
+                };
+                const nextRandomSlideIndex = () => {
+                    if (heroMediaSlides.length <= 1) return activeHeroMediaSlide;
+                    if (!shuffledHeroMediaQueue.length) {
+                        buildShuffledQueue(activeHeroMediaSlide);
+                    }
+                    const isDisallowedVideoCandidate = (index) => {
+                        if (!hasMultipleVideoSlides || lastShownVideoSlide === null) return false;
+                        const candidate = heroMediaSlides[index];
+                        return candidate && candidate.type === 'video' && index === lastShownVideoSlide;
+                    };
+                    let nextQueuePosition = shuffledHeroMediaQueue.findIndex((index) => !isDisallowedVideoCandidate(index));
+                    if (nextQueuePosition < 0) {
+                        buildShuffledQueue(activeHeroMediaSlide);
+                        nextQueuePosition = shuffledHeroMediaQueue.findIndex((index) => !isDisallowedVideoCandidate(index));
+                    }
+                    if (nextQueuePosition < 0) return activeHeroMediaSlide;
+                    const [nextIndex] = shuffledHeroMediaQueue.splice(nextQueuePosition, 1);
+                    return nextIndex;
+                };
+                const clearHeroMediaAutoTimer = () => {
+                    if (heroMediaAutoTimer !== null) {
+                        window.clearTimeout(heroMediaAutoTimer);
+                        heroMediaAutoTimer = null;
+                    }
+                };
+                const preloadImageSlide = (src) => {
+                    if (!src) return Promise.resolve(null);
+                    if (heroImagePreloadCache.has(src)) {
+                        return heroImagePreloadCache.get(src);
+                    }
+                    const preloadPromise = new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.decoding = 'async';
+                        img.onload = () => resolve(img);
+                        img.onerror = reject;
+                        img.src = src;
+                    });
+                    heroImagePreloadCache.set(src, preloadPromise);
+                    return preloadPromise;
+                };
+                const showHeroOverlayImage = (src) => {
+                    if (!src) return;
+                    if (heroCarouselImage.src !== src) {
+                        heroCarouselImage.src = src;
+                    }
+                    heroCarouselImage.style.visibility = 'visible';
+                    heroCarouselImage.style.opacity = '1';
+                };
+                const fadeOutHeroOverlay = () => {
+                    heroCarouselImage.style.opacity = '0';
+                    window.setTimeout(() => {
+                        if (heroCarouselImage.style.opacity === '0') {
+                            heroCarouselImage.style.visibility = 'hidden';
+                        }
+                    }, heroOverlayFadeMs + 24);
+                };
+                const setHeroVideoSource = (src) => {
+                    if (!src) return false;
+                    if (activeHeroVideoSrc === src) return false;
+                    activeHeroVideoSrc = src;
+                    if (heroVideoSourceNode) {
+                        heroVideoSourceNode.setAttribute('src', src);
+                        heroVideoSourceNode.setAttribute('type', src.toLowerCase().endsWith('.mp4') ? 'video/mp4' : 'video/quicktime');
+                        heroVideoElement.load();
+                        return true;
+                    }
+                    heroVideoElement.setAttribute('src', src);
+                    heroVideoElement.load();
+                    return true;
+                };
+                const applySafariVideoRenderFix = () => {
+                    if (!isSafariBrowser) return;
+                    // Safari can occasionally keep a stale video layer after source swaps.
+                    heroVideoElement.style.display = 'none';
+                    void heroVideoElement.offsetHeight;
+                    heroVideoElement.style.display = 'block';
+                };
+
+                const applyHeroMediaSlide = (nextIndex) => {
+                    const total = heroMediaSlides.length;
+                    if (!total) return;
+                    const normalized = ((nextIndex % total) + total) % total;
+                    const previousSlide = heroMediaSlides[activeHeroMediaSlide];
+                    activeHeroMediaSlide = normalized;
+                    const slide = heroMediaSlides[normalized];
+                    if (slide.type === 'video') {
+                        lastShownVideoSlide = normalized;
+                        const sourceWillChange = activeHeroVideoSrc !== slide.src;
+                        if (sourceWillChange) {
+                            if (previousSlide && previousSlide.type === 'image') {
+                                // Keep current image visible while next video buffers.
+                                heroCarouselImage.style.visibility = 'visible';
+                                heroCarouselImage.style.opacity = '1';
+                            } else {
+                                showHeroOverlayImage(heroVideoPosterMap[slide.src]);
+                            }
+                        }
+                        const activeLoadToken = ++heroVideoLoadToken;
+                        const sourceChanged = setHeroVideoSource(slide.src);
+                        const revealLoadedVideo = () => {
+                            if (activeLoadToken !== heroVideoLoadToken) return;
+                            heroVideoElement.style.objectFit = 'cover';
+                            heroVideoElement.style.objectPosition = 'center center';
+                            applySafariVideoRenderFix();
+                            requestAnimationFrame(() => {
+                                if (activeLoadToken !== heroVideoLoadToken) return;
+                                heroVideoElement.style.visibility = 'visible';
+                                heroVideoElement.style.opacity = '1';
+                                playHeroLoopVideo();
+                                fadeOutHeroOverlay();
+                            });
+                        };
+                        if (!sourceChanged) {
+                            revealLoadedVideo();
+                        } else {
+                            heroVideoElement.addEventListener('loadeddata', revealLoadedVideo, { once: true });
+                            heroVideoElement.addEventListener('error', revealLoadedVideo, { once: true });
+                        }
+                        return;
+                    }
+
+                    const activeLoadToken = ++heroVideoLoadToken;
+                    preloadImageSlide(slide.src).catch(() => null).finally(() => {
+                        if (activeLoadToken !== heroVideoLoadToken) return;
+                        showHeroOverlayImage(slide.src);
+                        heroVideoElement.pause();
+                        heroVideoElement.style.visibility = 'hidden';
+                        heroVideoElement.style.opacity = '0';
+                    });
+                };
+                const scheduleNextRandomHeroSlide = () => {
+                    clearHeroMediaAutoTimer();
+                    if (heroMediaSlides.length <= 1) return;
+                    const now = Date.now();
+                    const manualPauseRemainingMs = Math.max(0, heroManualPauseUntil - now);
+                    const currentSlide = heroMediaSlides[activeHeroMediaSlide];
+                    const delayMs = manualPauseRemainingMs || getSlideDurationMs(currentSlide);
+                    heroMediaAutoTimer = window.setTimeout(() => {
+                        if (Date.now() < heroManualPauseUntil) {
+                            scheduleNextRandomHeroSlide();
+                            return;
+                        }
+                        const randomIndex = nextRandomSlideIndex();
+                        applyHeroMediaSlide(randomIndex);
+                        scheduleNextRandomHeroSlide();
+                    }, delayMs);
+                };
+                const pauseAutoAfterManualNavigation = () => {
+                    heroManualPauseUntil = Date.now() + heroManualPauseDurationMs;
+                    scheduleNextRandomHeroSlide();
+                };
+
+                heroMediaPrev.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    applyHeroMediaSlide(activeHeroMediaSlide - 1);
+                    shuffledHeroMediaQueue = [];
+                    pauseAutoAfterManualNavigation();
+                });
+                heroMediaNext.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    applyHeroMediaSlide(activeHeroMediaSlide + 1);
+                    shuffledHeroMediaQueue = [];
+                    pauseAutoAfterManualNavigation();
+                });
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
-                        stopBoomerang();
+                        clearHeroMediaAutoTimer();
                         return;
                     }
-                    startBoomerang({ preserveDirection: true });
+                    scheduleNextRandomHeroSlide();
                 });
+                window.addEventListener('resize', applySafariVideoRenderFix);
+                heroMediaSlides
+                    .filter((slide) => slide.type === 'image')
+                    .forEach((slide) => {
+                        preloadImageSlide(slide.src).catch(() => {});
+                    });
+                Object.values(heroVideoPosterMap).forEach((posterSrc) => {
+                    preloadImageSlide(posterSrc).catch(() => {});
+                });
+
+                // Keep first visible media as the looped video, per spec.
+                applyHeroMediaSlide(0);
+                scheduleNextRandomHeroSlide();
             }
 
             // 4. Hero Entrance Animation
@@ -1143,39 +1514,39 @@
                 { label: "Spectral", family: "'Spectral', serif", googleName: "Spectral", weights: [300, 400, 500, 600, 700] }
             ];
             const binaryOptions = [
-                { label: "Off", value: "off" },
-                { label: "On", value: "on" }
+                { label: "Désactivé", value: "off" },
+                { label: "Activé", value: "on" }
             ];
             const cursorEffectOptions = [
-                { label: "Off", value: "off" },
-                { label: "On", value: "on" }
+                { label: "Désactivé", value: "off" },
+                { label: "Activé", value: "on" }
             ];
             const heroBackgroundOptions = [
-                { label: "Video", value: "video" },
-                { label: "Scroll Images", value: "scroll-images" }
+                { label: "Vidéo", value: "video" },
+                { label: "Images défilantes", value: "scroll-images" }
             ];
             const textEffectOptions = [
-                { label: "Off", value: "off" },
-                { label: "Water Ripple (Subtle)", value: "ripple" },
-                { label: "Canopy Breeze (Subtle)", value: "breeze" },
-                { label: "Rain Drops Warp (Subtle)", value: "rain" },
-                { label: "Tidal Wave", value: "tidal" },
-                { label: "Forest Breath", value: "forest" }
+                { label: "Désactivé", value: "off" },
+                { label: "Ondulation d'eau (subtil)", value: "ripple" },
+                { label: "Brise de canopée (subtil)", value: "breeze" },
+                { label: "Distorsion gouttes de pluie (subtil)", value: "rain" },
+                { label: "Vague de marée", value: "tidal" },
+                { label: "Souffle de forêt", value: "forest" }
             ];
             const colorEffectOptions = [
-                { label: "Soft Contrast (Default)", value: "soft-contrast" },
-                { label: "Luma Invert", value: "luma-invert" },
-                { label: "Spectrum Shine", value: "spectrum-shine" },
-                { label: "Opal Shine", value: "opal-shine" },
-                { label: "Wet Film", value: "wet-film" }
+                { label: "Contraste doux (défaut)", value: "soft-contrast" },
+                { label: "Inversion luma", value: "luma-invert" },
+                { label: "Brillance spectre", value: "spectrum-shine" },
+                { label: "Brillance opale", value: "opal-shine" },
+                { label: "Pellicule humide", value: "wet-film" }
             ];
             const scrollTitleFxOptions = [
-                { label: "Off", value: "off" },
-                { label: "Gaussian Blur Out", value: "gaussian-blur" }
+                { label: "Désactivé", value: "off" },
+                { label: "Flou gaussien sortant", value: "gaussian-blur" }
             ];
             const indexCaseOptions = [
-                { label: "All Caps", value: "uppercase" },
-                { label: "Normal Caps", value: "normalcaps" }
+                { label: "Majuscules", value: "uppercase" },
+                { label: "Casse normale", value: "normalcaps" }
             ];
 
             if (
@@ -2013,7 +2384,7 @@
                     statementTransitionTitle.style.fontWeight = String(fontWeight);
                     const matched = getFontConfig(fontFamily);
                     loadFontFace(matched ? matched.googleName : null, fontWeight);
-                    fontPickerValue.textContent = `Current: ${matched ? matched.label : fontFamily} ${fontWeight}`;
+                    fontPickerValue.textContent = `Actuel: ${matched ? matched.label : fontFamily} ${fontWeight}`;
                     applyHeroVariableAxis(matched);
                     localStorage.setItem('devHeroFont', fontFamily);
                     localStorage.setItem('devHeroFontWeight', String(fontWeight));
@@ -2079,8 +2450,8 @@
                     indexBodySizeScale.value = normalizedScale.toFixed(2);
                     indexColumnGapValue.textContent = normalizedGap.toFixed(2);
                     indexBodySizeScaleValue.textContent = normalizedScale.toFixed(2);
-                    const caseLabel = indexCasePicker.value === 'normalcaps' ? 'Normal Caps' : 'All Caps';
-                    indexControlsValue.textContent = `Current: ${caseLabel} • gap ${normalizedGap.toFixed(2)} • size ${normalizedScale.toFixed(2)}`;
+                    const caseLabel = indexCasePicker.value === 'normalcaps' ? 'Casse normale' : 'Majuscules';
+                    indexControlsValue.textContent = `Actuel: ${caseLabel} • écart ${normalizedGap.toFixed(2)} • taille ${normalizedScale.toFixed(2)}`;
                     localStorage.setItem('devIndexColumnGap', String(normalizedGap));
                     localStorage.setItem('devIndexBodyScale', String(normalizedScale));
                 };
@@ -2143,14 +2514,14 @@
                     const style = window.getComputedStyle(targetElement);
                     const textSnippet = (targetElement.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 44);
                     const styleLines = [
-                        `TEXT: ${textSnippet}${textSnippet.length >= 44 ? '…' : ''}`,
-                        `family: ${style.fontFamily}`,
-                        `weight: ${style.fontWeight}`,
-                        `size: ${style.fontSize}`,
-                        `line-height: ${style.lineHeight}`,
-                        `letter-spacing: ${style.letterSpacing}`,
-                        `transform: ${style.textTransform}`,
-                        `color: ${style.color}`
+                        `TEXTE: ${textSnippet}${textSnippet.length >= 44 ? '…' : ''}`,
+                        `famille: ${style.fontFamily}`,
+                        `graisse: ${style.fontWeight}`,
+                        `taille: ${style.fontSize}`,
+                        `interligne: ${style.lineHeight}`,
+                        `espacement lettres: ${style.letterSpacing}`,
+                        `transformation: ${style.textTransform}`,
+                        `couleur: ${style.color}`
                     ];
                     devTextInspector.textContent = styleLines.join('\n');
                     devTextInspector.classList.add('visible');
@@ -2160,31 +2531,29 @@
                 };
 
                 const defaultPreset = {
-                    font: "'Thermal VF Thin Text', serif",
-                    weight: 200,
-                    variableAxisOpsz: 770,
-                    backgroundMode: "scroll-images",
+                    font: "'Verdigris MVB Pro Big', serif",
+                    weight: 700,
+                    backgroundMode: "video",
                     textEffect: "off",
-                    colorEffect: "soft-contrast",
-                    scrollTitleFx: "gaussian-blur",
+                    colorEffect: "difference",
+                    scrollTitleFx: "off",
                     grayscale: "off",
                     invert: "off",
-                    cursorEffect: "on",
+                    cursorEffect: "off",
                     sizeMobile: 18,
-                    sizeDesktop: 8.9,
-                    letterSpacing: 0.01,
-                    lineHeight: 0.79
+                    sizeDesktop: 14,
+                    letterSpacing: -0.018,
+                    lineHeight: 0.74
                 };
                 const indexDefaultPreset = {
                     case: "normalcaps",
                     columnGap: 3.2,
                     bodyScale: 0.75
                 };
-                const defaultPresetVersion = "2026-03-14";
+                const defaultPresetVersion = "2026-03-17-video-loop";
                 if (localStorage.getItem('devHeroDefaultsVersion') !== defaultPresetVersion) {
                     localStorage.setItem('devHeroFont', defaultPreset.font);
                     localStorage.setItem('devHeroFontWeight', String(defaultPreset.weight));
-                    localStorage.setItem('devHeroVariableAxis-thermal-vf-thin-text-opsz', String(defaultPreset.variableAxisOpsz));
                     localStorage.setItem('devHeroBackgroundMode', defaultPreset.backgroundMode);
                     localStorage.setItem('devHeroTextEffect', defaultPreset.textEffect);
                     localStorage.setItem('devHeroColorEffect', defaultPreset.colorEffect);
@@ -2223,7 +2592,6 @@
                 const savedGrayscale = localStorage.getItem('devHeroGrayscale');
                 const savedInvert = localStorage.getItem('devHeroInvert');
                 const savedCursorEffect = localStorage.getItem('devCursorEffect');
-                const savedBackgroundMode = localStorage.getItem('devHeroBackgroundMode');
                 const savedTextEffect = localStorage.getItem('devHeroTextEffect');
                 const savedColorEffect = localStorage.getItem('devHeroColorEffect');
                 const savedScrollTitleFx = localStorage.getItem('devHeroScrollTitleFx');
@@ -2233,7 +2601,8 @@
                 const initialFontConfig = getFontConfig(initialFont);
                 const initialWeight = refreshWeightOptions(initialFontConfig, savedWeight);
                 applyHeroFont(initialFont, initialWeight);
-                applyHeroBackgroundMode(savedBackgroundMode || defaultPreset.backgroundMode);
+                applyHeroBackgroundMode('video');
+                localStorage.setItem('devHeroBackgroundMode', 'video');
                 applyHeroTextEffect(savedTextEffect || defaultPreset.textEffect);
                 applyHeroColorEffect(savedColorEffect || defaultPreset.colorEffect);
                 applyHeroScrollTitleFx(savedScrollTitleFx || defaultPreset.scrollTitleFx);
