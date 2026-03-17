@@ -1138,6 +1138,7 @@
                     const formatClient = (value) => {
                         const raw = String(value || '').trim();
                         if (!raw) return '';
+                        if (/^Biennale de Venise$/i.test(raw)) return 'Biennale de Venise';
                         const tokens = raw.split(/\s+/);
                         const lastToken = tokens[tokens.length - 1] || '';
                         const city = lastToken.replace(/[.,;:!?]+$/, '');
