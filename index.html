@@ -1084,11 +1084,11 @@
 
             <!-- The List (Zero padding/margins to mimic text block) -->
             <div class="flex flex-col w-full relative group/index text-white gs-reveal" id="index-list">
-                <div class="index-head-row hidden md:grid index-dev-grid font-mono-label text-[0.65rem] text-white mb-4">
-                    <div class="index-head-ref">Reference</div>
-                    <div class="index-head-client">Client</div>
-                    <div class="index-head-type">Typologie</div>
-                    <div class="index-head-year">Annee</div>
+                <div class="index-head-row hidden md:grid index-dev-grid text-white mb-4" aria-hidden="true">
+                    <div class="index-col-ref font-mono-label text-[0.65rem]">Reference</div>
+                    <div class="index-col-client font-mono-label text-[0.65rem]">Client</div>
+                    <div class="index-col-type font-mono-label text-[0.65rem]">Typologie</div>
+                    <div class="index-col-year font-mono-label text-[0.65rem]">Annee</div>
                 </div>
                 <!-- Injecting index rows -->
                 <script>
