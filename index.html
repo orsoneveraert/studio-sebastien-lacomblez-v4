@@ -508,6 +508,13 @@
             letter-spacing: 0;
             transform: translateY(0);
         }
+        #index .index-year-open-arrow-img {
+            display: none;
+            width: 0.74em;
+            height: 0.74em;
+            object-fit: contain;
+            transform: translateY(-0.02em);
+        }
         #index .index-year-hover {
             display: none;
         }
@@ -624,7 +631,7 @@
                 display: none;
             }
             #index-list .index-body-row {
-                font-size: clamp(1.85rem, calc(5.2vw * var(--index-body-size-scale)), 2.55rem);
+                font-size: clamp(1.55rem, calc(4.45vw * var(--index-body-size-scale)), 2.1rem);
                 letter-spacing: -0.014em;
             }
             #index-table thead .index-col-ref,
@@ -648,6 +655,17 @@
                 width: 100%;
                 text-align: right;
                 margin-left: 0;
+            }
+            #index .index-year-open-state {
+                left: auto;
+                right: calc(100% + 0.1em);
+                align-items: flex-end;
+            }
+            #index .index-year-open-arrow {
+                display: none;
+            }
+            #index .index-year-open-arrow-img {
+                display: block;
             }
             #index-table thead .index-col-year {
                 text-align: right;
@@ -1215,6 +1233,7 @@
                                         `<span class="index-year-open-state">` +
                                             `<span class="index-year-open-label">en cours</span>` +
                                             `<span class="index-year-open-arrow" aria-hidden="true">⤴</span>` +
+                                            `<img class="index-year-open-arrow-img" src="./assets/arrow-left-mobile.png" alt="" aria-hidden="true">` +
                                         `</span>` +
                                     `</span>`
                             };
