@@ -522,7 +522,7 @@
             background: #000;
             color: #fff;
             position: relative;
-            z-index: 70;
+            z-index: auto;
         }
         #contact a,
         #contact p {
@@ -1526,6 +1526,7 @@
                 let heroMediaAutoTimer = null;
                 let shuffledHeroMediaQueue = [];
                 let heroVideoLoadToken = 0;
+                let heroStaggerPreloadTimer = null;
                 const heroOverlayFadeMs = 260;
                 const heroManualPauseDurationMs = 10000;
                 let heroManualPauseUntil = 0;
@@ -1534,6 +1535,8 @@
                 const heroImagePreloadCache = new Map();
                 const heroVideoPreloadCache = new Map();
                 const heroPreloadHintCache = new Set();
+                const heroReadyImageSrcSet = new Set();
+                const heroReadyVideoSrcSet = new Set();
                 let activeHeroMediaObjectPosition = 'center center';
                 const heroVideoPosterMap = {
                     './assets/IMG_3550.mp4': './assets/hero-posters/IMG_3550.jpg',
@@ -1577,6 +1580,13 @@
                     }
                     shuffledHeroMediaQueue = indexes;
                 };
+                const isSlideReady = (index) => {
+                    const slide = heroMediaSlides[index];
+                    if (!slide) return false;
+                    if (slide.type === 'image') return heroReadyImageSrcSet.has(slide.src);
+                    if (heroReadyVideoSrcSet.has(slide.src)) return true;
+                    return index === activeHeroMediaSlide && heroVideoElement.readyState >= 2;
+                };
                 const nextRandomSlideIndex = () => {
                     if (heroMediaSlides.length <= 1) return activeHeroMediaSlide;
                     if (!shuffledHeroMediaQueue.length) {
@@ -1589,19 +1599,28 @@
                         if (!hasMultipleVideoSlides || lastShownVideoSlide === null) return false;
                         return index === lastShownVideoSlide;
                     };
-                    const findNextQueuePosition = (enforceImageGap) =>
-                        shuffledHeroMediaQueue.findIndex((index) => !isDisallowedVideoCandidate(index, enforceImageGap));
-                    let nextQueuePosition = findNextQueuePosition(true);
+                    const findNextQueuePosition = (enforceImageGap, requireReady) =>
+                        shuffledHeroMediaQueue.findIndex((index) =>
+                            !isDisallowedVideoCandidate(index, enforceImageGap) && (!requireReady || isSlideReady(index))
+                        );
+                    let nextQueuePosition = findNextQueuePosition(true, true);
                     if (nextQueuePosition < 0) {
                         buildShuffledQueue(activeHeroMediaSlide);
-                        nextQueuePosition = findNextQueuePosition(true);
+                        nextQueuePosition = findNextQueuePosition(true, true);
                     }
                     if (nextQueuePosition < 0) {
-                        nextQueuePosition = findNextQueuePosition(false);
+                        nextQueuePosition = findNextQueuePosition(false, true);
                     }
                     if (nextQueuePosition < 0) {
                         buildShuffledQueue(activeHeroMediaSlide);
-                        nextQueuePosition = findNextQueuePosition(false);
+                        nextQueuePosition = findNextQueuePosition(false, true);
+                    }
+                    if (nextQueuePosition < 0) {
+                        nextQueuePosition = findNextQueuePosition(true, false);
+                    }
+                    if (nextQueuePosition < 0) {
+                        buildShuffledQueue(activeHeroMediaSlide);
+                        nextQueuePosition = findNextQueuePosition(false, false);
                     }
                     if (nextQueuePosition < 0) return activeHeroMediaSlide;
                     const [nextIndex] = shuffledHeroMediaQueue.splice(nextQueuePosition, 1);
@@ -1618,11 +1637,17 @@
                     if (heroImagePreloadCache.has(src)) {
                         return heroImagePreloadCache.get(src);
                     }
-                    const preloadPromise = new Promise((resolve, reject) => {
+                    const preloadPromise = new Promise((resolve) => {
                         const img = new Image();
                         img.decoding = 'async';
-                        img.onload = () => resolve(img);
-                        img.onerror = reject;
+                        img.onload = () => {
+                            heroReadyImageSrcSet.add(src);
+                            resolve(img);
+                        };
+                        img.onerror = () => {
+                            heroImagePreloadCache.delete(src);
+                            resolve(null);
+                        };
                         img.src = src;
                     });
                     heroImagePreloadCache.set(src, preloadPromise);
@@ -1640,14 +1665,21 @@
                         video.preload = preloadMode;
                         video.src = src;
                         let settled = false;
-                        const settle = () => {
+                        const settleReady = () => {
                             if (settled) return;
                             settled = true;
+                            heroReadyVideoSrcSet.add(src);
                             resolve(video);
                         };
-                        video.addEventListener('loadeddata', settle, { once: true });
-                        video.addEventListener('canplay', settle, { once: true });
-                        video.addEventListener('error', settle, { once: true });
+                        const settleError = () => {
+                            if (settled) return;
+                            settled = true;
+                            heroVideoPreloadCache.delete(src);
+                            resolve(null);
+                        };
+                        video.addEventListener('loadeddata', settleReady, { once: true });
+                        video.addEventListener('canplay', settleReady, { once: true });
+                        video.addEventListener('error', settleError, { once: true });
                         video.load();
                     });
                     heroVideoPreloadCache.set(src, preloadPromise);
@@ -1673,9 +1705,9 @@
                         if (!slide) continue;
                         addHeroPreloadHint(slide);
                         if (slide.type === 'image') {
-                            preloadImageSlide(slide.src).catch(() => {});
+                            preloadImageSlide(slide.src);
                         } else {
-                            preloadVideoSlide(slide.src, offset <= 4 ? 'auto' : 'metadata').catch(() => {});
+                            preloadVideoSlide(slide.src, offset <= 4 ? 'auto' : 'metadata');
                         }
                     }
                 };
@@ -1804,6 +1836,7 @@
                                 if (activeLoadToken !== heroVideoLoadToken) return;
                                 heroVideoElement.style.visibility = 'visible';
                                 heroVideoElement.style.opacity = '1';
+                                heroReadyVideoSrcSet.add(slide.src);
                                 playHeroLoopVideo();
                                 waitForHeroVideoFrame().finally(() => {
                                     if (activeLoadToken !== heroVideoLoadToken) return;
@@ -1827,9 +1860,11 @@
 
                     imageSlidesSinceLastVideo = Math.min(minImageSlidesBetweenVideos, imageSlidesSinceLastVideo + 1);
                     const activeLoadToken = ++heroVideoLoadToken;
-                    preloadImageSlide(slide.src).catch(() => null).finally(() => {
+                    preloadImageSlide(slide.src).then((loadedImage) => {
                         if (activeLoadToken !== heroVideoLoadToken) return;
+                        if (!loadedImage) return;
                         showHeroOverlayImage(slide.src);
+                        heroReadyImageSrcSet.add(slide.src);
                         heroVideoElement.pause();
                         heroVideoElement.style.visibility = 'hidden';
                         heroVideoElement.style.opacity = '0';
@@ -1874,34 +1909,56 @@
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
                         clearHeroMediaAutoTimer();
+                        if (heroStaggerPreloadTimer !== null) {
+                            window.clearTimeout(heroStaggerPreloadTimer);
+                            heroStaggerPreloadTimer = null;
+                        }
                         return;
                     }
                     scheduleNextRandomHeroSlide();
+                    startHeroStaggerPreload();
                 });
                 window.addEventListener('resize', applySafariVideoRenderFix);
                 heroVideoElement.addEventListener('loadedmetadata', applySafariVideoRenderFix);
                 heroVideoElement.addEventListener('loadeddata', applySafariVideoRenderFix);
                 heroVideoElement.addEventListener('canplay', applySafariVideoRenderFix);
                 heroVideoElement.addEventListener('playing', applySafariVideoRenderFix);
-                heroMediaSlides
-                    .filter((slide) => slide.type === 'image')
-                    .forEach((slide) => {
-                        preloadImageSlide(slide.src).catch(() => {});
-                    });
-                heroMediaSlides
-                    .filter((slide) => slide.type === 'video')
-                    .slice(0, 8)
-                    .forEach((slide) => {
+                const heroStaggerPreloadOrder = heroMediaSlides
+                    .map((_, index) => index)
+                    .filter((index) => index !== 0);
+                let heroStaggerPreloadCursor = 0;
+                const runHeroStaggerPreloadTick = () => {
+                    const batchSize = 4;
+                    for (let batchIndex = 0; batchIndex < batchSize && heroStaggerPreloadCursor < heroStaggerPreloadOrder.length; batchIndex += 1) {
+                        const slideIndex = heroStaggerPreloadOrder[heroStaggerPreloadCursor];
+                        heroStaggerPreloadCursor += 1;
+                        const slide = heroMediaSlides[slideIndex];
+                        if (!slide) continue;
                         addHeroPreloadHint(slide);
-                        preloadVideoSlide(slide.src, 'auto').catch(() => {});
-                    });
+                        if (slide.type === 'image') {
+                            preloadImageSlide(slide.src);
+                        } else {
+                            preloadVideoSlide(slide.src, slideIndex <= 6 ? 'auto' : 'metadata');
+                        }
+                    }
+                    if (heroStaggerPreloadCursor < heroStaggerPreloadOrder.length) {
+                        heroStaggerPreloadTimer = window.setTimeout(runHeroStaggerPreloadTick, 220);
+                    } else {
+                        heroStaggerPreloadTimer = null;
+                    }
+                };
+                const startHeroStaggerPreload = () => {
+                    if (heroStaggerPreloadTimer !== null || heroStaggerPreloadCursor >= heroStaggerPreloadOrder.length) return;
+                    heroStaggerPreloadTimer = window.setTimeout(runHeroStaggerPreloadTick, 0);
+                };
                 Object.values(heroVideoPosterMap).forEach((posterSrc) => {
-                    preloadImageSlide(posterSrc).catch(() => {});
+                    preloadImageSlide(posterSrc);
                 });
 
                 // Keep first visible media as the looped video, per spec.
                 enforceHeroVideoCoverLayout();
                 applyHeroMediaSlide(0);
+                startHeroStaggerPreload();
                 scheduleNextRandomHeroSlide();
             }
 
@@ -1966,12 +2023,51 @@
 
             if(hoverImgContainer && hoverImgTarget && window.innerWidth > 768) {
                 const hoverImagePreloadSet = new Set();
+                const listContainer = document.getElementById('index-list');
+                let pointerX = Math.round(window.innerWidth / 2);
+                let pointerY = Math.round(window.innerHeight / 2);
+                let hoverSyncRaf = null;
+                const hideHoverImage = () => {
+                    gsap.set(hoverImgContainer, { opacity: 0 });
+                };
                 const preloadIndexHoverImage = (src) => {
                     if (!src || hoverImagePreloadSet.has(src)) return;
                     hoverImagePreloadSet.add(src);
                     const img = new Image();
                     img.decoding = 'async';
                     img.src = src;
+                };
+                const updateHoverImageFromRow = (row) => {
+                    if (!row) {
+                        hideHoverImage();
+                        return;
+                    }
+                    const imgSrc = row.getAttribute('data-img');
+                    if (!imgSrc) {
+                        hideHoverImage();
+                        return;
+                    }
+                    preloadIndexHoverImage(imgSrc);
+                    if (hoverImgTarget.src !== imgSrc) {
+                        gsap.fromTo(hoverImgTarget, { scale: 1.2 }, { scale: 1, duration: 0.7, ease: "power2.out" });
+                        hoverImgTarget.src = imgSrc;
+                    }
+                    centerHoverImage();
+                    gsap.set(hoverImgContainer, { opacity: 1 });
+                };
+                const scheduleHoverSync = () => {
+                    if (hoverSyncRaf !== null) return;
+                    hoverSyncRaf = window.requestAnimationFrame(() => {
+                        hoverSyncRaf = null;
+                        if (!listContainer) return;
+                        const hoveredElement = document.elementFromPoint(pointerX, pointerY);
+                        const hoveredRow = hoveredElement ? hoveredElement.closest('.index-row-container') : null;
+                        if (!hoveredRow || !listContainer.contains(hoveredRow)) {
+                            hideHoverImage();
+                            return;
+                        }
+                        updateHoverImageFromRow(hoveredRow);
+                    });
                 };
                 const initialHoverPreloads = Array.from(indexRows)
                     .map((row) => row.getAttribute('data-img'))
@@ -1985,26 +2081,26 @@
                 };
                 centerHoverImage();
                 window.addEventListener('resize', centerHoverImage);
+                window.addEventListener('resize', scheduleHoverSync, { passive: true });
+                window.addEventListener('scroll', scheduleHoverSync, { passive: true });
+                window.addEventListener('blur', hideHoverImage);
+                document.addEventListener('mouseleave', hideHoverImage);
+                document.addEventListener('mousemove', (event) => {
+                    pointerX = event.clientX;
+                    pointerY = event.clientY;
+                    scheduleHoverSync();
+                }, { passive: true });
 
                 indexRows.forEach(row => {
                     row.addEventListener('mouseenter', (e) => {
-                        const imgSrc = row.getAttribute('data-img');
-                        preloadIndexHoverImage(imgSrc);
-                        if(hoverImgTarget.src !== imgSrc) {
-                            // Slight zoom effect on change
-                            gsap.fromTo(hoverImgTarget, {scale: 1.2}, {scale: 1, duration: 0.7, ease: "power2.out"});
-                            hoverImgTarget.src = imgSrc;
-                        }
-                        centerHoverImage();
-                        gsap.set(hoverImgContainer, { opacity: 1 });
+                        pointerX = e.clientX;
+                        pointerY = e.clientY;
+                        updateHoverImageFromRow(row);
                     });
                 });
                 
                 // Hide when leaving the list
-                const listContainer = document.getElementById('index-list');
-                listContainer.addEventListener('mouseleave', () => {
-                     gsap.set(hoverImgContainer, { opacity: 0 });
-                });
+                listContainer.addEventListener('mouseleave', hideHoverImage);
             }
 
             // 8. Dev Mode Hero Controls (Ctrl + Shift + D)
