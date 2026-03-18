@@ -36,7 +36,7 @@
             --hero-video-filter: none;
             --index-column-gap: 1rem;
             --index-body-size-scale: 1;
-            --index-year-column-width: 12ch;
+            --index-mobile-year-width: 8.6ch;
         }
         @font-face {
             font-family: 'Acumin Pro';
@@ -427,165 +427,84 @@
             color: #fff;
         }
         .index-row-container:hover .index-text { color: inherit; }
-        .index-dev-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            align-items: baseline;
-            gap: var(--index-column-gap);
+        #index-list {
             width: 100%;
-            min-width: 0;
+            overflow-x: auto;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
         }
-        #index .index-head-ref,
-        #index .index-head-client,
-        #index .index-head-type,
-        #index .index-col-ref,
-        #index .index-col-client,
-        #index .index-col-type {
-            justify-self: stretch;
-            text-align: left;
-        }
-        #index .index-col-ref {
-            grid-column: 1 / 2;
-        }
-        #index .index-head-year,
-        #index .index-col-year {
-            white-space: nowrap;
-            word-break: keep-all;
-            hyphens: none;
-            display: flex;
-            justify-content: flex-start;
-            text-align: left;
-            font-variant-numeric: tabular-nums;
-            align-items: baseline;
-            gap: 0.1em;
-            justify-self: end;
-            width: var(--index-year-column-width);
-            max-width: var(--index-year-column-width);
-        }
-        #index .index-col-year {
-            grid-column: 2 / 3;
-        }
-        #index .index-head-year {
-            min-width: var(--index-year-column-width);
-            width: var(--index-year-column-width);
-            max-width: var(--index-year-column-width);
-            justify-self: end;
-            justify-content: flex-start;
-            text-align: left;
-        }
-        #index .index-year-default,
-        #index .index-year-hover {
-            text-transform: none;
-            white-space: nowrap;
-            display: inline-block;
+        #index-table {
+            border-collapse: collapse;
+            table-layout: auto;
             width: max-content;
-            max-width: none;
+            min-width: 100%;
         }
-        #index .index-year-hover {
-            font-size: inherit;
-            line-height: inherit;
-            opacity: 0;
-            visibility: hidden;
-            letter-spacing: inherit;
-            pointer-events: none;
+        #index-table th,
+        #index-table td {
+            padding: 0;
+            vertical-align: baseline;
+            text-align: left;
+            white-space: nowrap;
         }
-        #index .index-col-year-open {
-            cursor: pointer;
-            user-select: none;
-            display: inline-grid;
-            align-items: baseline;
-            justify-items: start;
+        #index-table tbody .index-row-container td {
+            padding-block: 0.08em;
         }
-        #index .index-col-year-open .index-year-default,
-        #index .index-col-year-open .index-year-hover {
-            grid-area: 1 / 1;
+        #index-table .index-col-ref,
+        #index-table .index-col-client,
+        #index-table .index-col-type {
+            padding-right: var(--index-column-gap);
+            overflow: visible;
+            text-overflow: clip;
         }
-        #index .index-col-year-open:hover .index-year-default,
-        #index .index-col-year-open.is-active .index-year-default {
-            opacity: 0;
-            visibility: hidden;
-        }
-        #index .index-col-year-open:hover .index-year-hover,
-        #index .index-col-year-open.is-active .index-year-hover {
-            opacity: 1;
-            visibility: visible;
-        }
-        @media (min-width: 768px) {
-            #index .index-dev-grid {
-                grid-template-columns: minmax(0, 3.3fr) minmax(0, 4fr) minmax(0, 2.4fr) var(--index-year-column-width);
-                align-items: baseline;
-            }
-            #index .index-head-ref,
-            #index .index-col-ref {
-                grid-column: 1 / 2;
-            }
-            #index .index-head-client,
-            #index .index-col-client {
-                grid-column: 2 / 3;
-            }
-            #index .index-head-type,
-            #index .index-col-type {
-                grid-column: 3 / 4;
-            }
-            #index .index-head-year,
-            #index .index-col-year {
-                grid-column: 4 / 5;
-            }
-            #index .index-head-ref,
-            #index .index-head-client,
-            #index .index-head-type,
-            #index .index-col-ref,
-            #index .index-col-client,
-            #index .index-col-type {
-                white-space: nowrap;
-                min-width: 0;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            #index .index-head-year,
-            #index .index-col-year {
-                min-width: 0;
-                width: var(--index-year-column-width);
-                max-width: var(--index-year-column-width);
-                justify-self: end;
-                padding-left: 0;
-                border-left: none;
-                overflow: visible;
-            }
+        #index-table .index-col-year {
+            width: 1%;
+            min-width: max-content;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+            overflow: visible;
+            text-overflow: clip;
         }
         #index-list .index-body-row {
             font-family: 'Acumin Pro Semi Condensed', 'Acumin Pro', sans-serif;
             font-weight: 550;
-            font-size: calc(1.16rem * var(--index-body-size-scale));
+            font-size: clamp(1rem, calc((0.62rem + 1.38vw) * var(--index-body-size-scale)), 3.8rem);
             text-transform: uppercase;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.016em;
         }
-        @media (max-width: 767px) {
-            #index .index-dev-grid {
-                grid-template-columns: minmax(0, 1fr) var(--index-year-column-width);
-                gap: clamp(0.85rem, 3.2vw, 1.25rem);
-            }
-            #index-list .index-body-row {
-                font-size: clamp(2rem, calc(5.35vw * var(--index-body-size-scale)), 2.55rem);
-                letter-spacing: -0.014em;
-            }
-            #index .index-col-ref {
-                min-width: 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            #index .index-col-year {
-                width: var(--index-year-column-width);
-                max-width: var(--index-year-column-width);
-                justify-self: end;
-                justify-content: flex-start;
-                text-align: left;
-            }
+        #index .index-year-default,
+        #index .index-year-hover,
+        #index .index-year-mobile-stack {
+            text-transform: none;
+            white-space: nowrap;
+        }
+        #index .index-year-hover {
+            display: none;
+        }
+        #index .index-year-mobile-stack {
+            display: none;
+        }
+        #index .index-year-open-inline {
+            display: inline-flex;
+            align-items: flex-start;
+            gap: 0.08em;
+        }
+        #index .index-year-open-base {
+            line-height: 1;
+        }
+        #index .index-year-open-sup {
+            font-size: 0.5em;
+            line-height: 1;
+            letter-spacing: 0.01em;
+            position: relative;
+            top: -0.44em;
+            text-transform: none;
+            font-weight: 500;
         }
         #contact {
             background: #000;
             color: #fff;
+            position: relative;
+            z-index: 70;
         }
         #contact a,
         #contact p {
@@ -599,28 +518,145 @@
             opacity: 0.96;
             user-select: none;
             pointer-events: none;
-        }
-        @media (min-width: 768px) and (max-width: 1279px) {
-            #index .index-dev-grid {
-                gap: clamp(0.55rem, 0.95vw, 1.2rem);
-            }
-            #index-list .index-body-row {
-                font-size: clamp(1rem, calc(1.25vw * var(--index-body-size-scale)), 1.42rem);
-                letter-spacing: -0.012em;
-            }
-        }
-        @media (min-width: 1280px) {
-            #index .index-dev-grid {
-                grid-template-columns: minmax(0, 3.8fr) minmax(0, 4.8fr) minmax(0, 2.8fr) var(--index-year-column-width);
-            }
-            #index-list .index-body-row {
-                font-size: clamp(1.68rem, calc(2.34vw * var(--index-body-size-scale)), 3.8rem);
-            }
+            position: relative;
+            z-index: 71;
         }
         body.index-case-normalcaps #index-list .index-body-row {
             text-transform: none;
             font-variant-caps: normal;
             letter-spacing: 0.005em;
+        }
+        @media (min-width: 768px) {
+            #index-table col.col-year {
+                width: 11ch;
+            }
+            #index-table .index-col-year {
+                width: 11ch;
+                min-width: 11ch;
+                text-align: center;
+            }
+        }
+        @media (max-width: 1200px) and (min-width: 768px) {
+            #index-table col.col-type {
+                width: 0 !important;
+            }
+            #index-table th.index-col-type,
+            #index-table td.index-col-type {
+                display: none;
+            }
+            #index-table .index-col-ref,
+            #index-table .index-col-client {
+                padding-right: clamp(0.75rem, 1.4vw, 1.35rem);
+            }
+            #index-list .index-body-row {
+                font-size: clamp(0.95rem, calc((0.55rem + 1.22vw) * var(--index-body-size-scale)), 2.2rem);
+            }
+        }
+        @media (max-width: 767px) {
+            #index {
+                padding-right: 1rem !important;
+            }
+            #index-list {
+                overflow-x: hidden;
+            }
+            #index-table {
+                table-layout: auto;
+                width: 100%;
+                min-width: 100%;
+            }
+            #index-table colgroup {
+                display: none;
+            }
+            #index-table thead {
+                display: none;
+            }
+            #index-table tbody {
+                display: block;
+                width: 100%;
+            }
+            #index-table tbody tr {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) max-content;
+                width: 100%;
+                align-items: baseline;
+            }
+            #index-table th.index-col-client,
+            #index-table td.index-col-client,
+            #index-table th.index-col-type,
+            #index-table td.index-col-type {
+                display: none;
+            }
+            #index-list .index-body-row {
+                font-size: clamp(1.85rem, calc(5.2vw * var(--index-body-size-scale)), 2.55rem);
+                letter-spacing: -0.014em;
+            }
+            #index-table thead .index-col-ref,
+            #index-table tbody .index-col-ref {
+                padding-right: clamp(0.75rem, 3.2vw, 1.2rem);
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            #index-table .index-col-year {
+                width: auto !important;
+                min-width: var(--index-mobile-year-width);
+                justify-self: end;
+                text-align: right;
+                padding-right: 0;
+                display: block;
+            }
+            #index-table .index-col-year .index-year-default {
+                display: block;
+                width: max-content;
+                text-align: right;
+                margin-left: auto;
+            }
+            #index-table .index-col-year.index-col-year-cycle .index-year-default {
+                display: none;
+            }
+            #index-table .index-col-year.index-col-year-cycle .index-year-mobile-stack {
+                display: inline-grid;
+                grid-template-areas: "mobile-year";
+                align-items: baseline;
+                justify-items: end;
+                min-width: var(--index-mobile-year-width);
+                overflow: hidden;
+            }
+            #index-table .index-col-year.index-col-year-cycle .index-year-mobile-a,
+            #index-table .index-col-year.index-col-year-cycle .index-year-mobile-b {
+                grid-area: mobile-year;
+                display: block;
+                width: max-content;
+                text-align: right;
+                margin-left: auto;
+                transition-property: opacity, clip-path, -webkit-clip-path;
+                transition-duration: 360ms;
+                transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+                will-change: opacity, clip-path;
+            }
+            #index-table .index-col-year.index-col-year-cycle .index-year-mobile-a {
+                opacity: 1;
+                transition-delay: 0ms;
+                -webkit-clip-path: inset(0 0 0 0);
+                clip-path: inset(0 0 0 0);
+            }
+            #index-table .index-col-year.index-col-year-cycle .index-year-mobile-b {
+                opacity: 0;
+                transition-delay: 64ms;
+                -webkit-clip-path: inset(0 100% 0 0);
+                clip-path: inset(0 100% 0 0);
+            }
+            #index-table .index-col-year.index-col-year-cycle.is-mobile-year-phase-b .index-year-mobile-a {
+                opacity: 0;
+                transition-delay: 64ms;
+                -webkit-clip-path: inset(0 100% 0 0);
+                clip-path: inset(0 100% 0 0);
+            }
+            #index-table .index-col-year.index-col-year-cycle.is-mobile-year-phase-b .index-year-mobile-b {
+                opacity: 1;
+                transition-delay: 0ms;
+                -webkit-clip-path: inset(0 0 0 0);
+                clip-path: inset(0 0 0 0);
+            }
         }
         .font-display {
             font-family: var(--font-sans);
@@ -934,7 +970,7 @@
                         <p>Le jardin est une forme artistique totale, à la fois œuvre et milieu.</p>
                         <p>Il n’y a pas de différence entre intérieur et extérieur – un aquarium est un jardin.</p>
                         <p>La question est à la fois technique et esthétique. Elle tient à la fenêtre, à ce point de vue qui ordonne et sélectionne ce qui apparaît.</p>
-                        <p>Le jardin est un objet de désir, au sens où il procède d’une attente et d’une projection. Ce désir s’éprouve au contact du site et s’y ajuste. Les sols, les microclimats, les plantes en présence guident la forme plutôt qu’une image imposée. Les images orientent le projet : elles accompagnent la conception du jardin, tandis que l’expérience du jardin infléchit en retour leur production. Le jardin s’opère à partir d’une boucle de rétroaction qui unit le rêve à la réalité.</p>
+                        <p>Le jardin est un objet de désir, au sens où il procède d’une attente et d’une projection. Ce désir s’éprouve au contact du site et s’y ajuste. Les sols, les microclimats, les plantes en présence guident la forme. Les images orientent le projet : elles accompagnent la conception du jardin, tandis que l’expérience du jardin infléchit en retour leur production. Le jardin s’opère à partir d’une boucle de rétroaction qui unit le rêve à la réalité.</p>
                         <p>Sébastien Lacomblez</p>
                         <div class="hero-contact-block">
                             <p class="hero-contact-title">CONTACT</p>
@@ -1078,18 +1114,29 @@
         <!-- Brutalist Spreadsheet Index Section -->
         <section class="w-full px-4 md:px-10 pt-12 md:pt-20 pb-8 md:pb-16 bg-black relative" id="index">
             <!-- Hover Image Reveal Container -->
-            <div id="index-hover-img" class="fixed top-0 left-0 w-[60vw] md:w-[25vw] aspect-[4/5] pointer-events-none z-30 opacity-0 overflow-hidden hidden md:block">
-                <img id="index-img-target" src="" class="w-full h-full object-cover scale-110 transition-transform duration-700" alt="Aperçu">
+            <div id="index-hover-img" class="fixed top-0 left-0 w-[60vw] md:w-[25vw] aspect-[4/5] pointer-events-none z-[15] opacity-0 overflow-hidden hidden md:block">
+                <img id="index-img-target" src="" class="w-full h-full object-cover scale-100 transition-transform duration-700" alt="Aperçu">
             </div>
 
             <!-- The List (Zero padding/margins to mimic text block) -->
-            <div class="flex flex-col w-full relative group/index text-white gs-reveal" id="index-list">
-                <div class="index-head-row hidden md:grid index-dev-grid text-white mb-4" aria-hidden="true">
-                    <div class="index-col-ref font-mono-label text-[0.65rem]">Reference</div>
-                    <div class="index-col-client font-mono-label text-[0.65rem]">Client</div>
-                    <div class="index-col-type font-mono-label text-[0.65rem]">Typologie</div>
-                    <div class="index-col-year font-mono-label text-[0.65rem]">Annee</div>
-                </div>
+            <div class="w-full relative z-20 group/index text-white gs-reveal" id="index-list">
+                <table id="index-table">
+                    <colgroup>
+                        <col class="col-ref">
+                        <col class="col-client">
+                        <col class="col-type">
+                        <col class="col-year">
+                    </colgroup>
+                    <thead class="hidden md:table-header-group">
+                        <tr class="index-head-row">
+                            <th scope="col" class="index-col-ref font-mono-label text-[0.65rem]">Reference</th>
+                            <th scope="col" class="index-col-client font-mono-label text-[0.65rem]">Client</th>
+                            <th scope="col" class="index-col-type font-mono-label text-[0.65rem]">Typologie</th>
+                            <th scope="col" class="index-col-year font-mono-label text-[0.65rem]">Annee</th>
+                        </tr>
+                    </thead>
+                    <tbody id="index-list-body"></tbody>
+                </table>
                 <!-- Injecting index rows -->
                 <script>
                     const indexImagePool = [
@@ -1142,29 +1189,35 @@
                         const city = lastToken.replace(/[.,;:!?]+$/, '');
                         if (!clientCities.has(city)) return raw;
                         const base = raw.slice(0, raw.lastIndexOf(lastToken)).trim().replace(/,\s*$/, '');
-                        return base ? `${base}, ${city}` : city;
+                        if (!base) return city;
+                        if (/\b(?:de|d['’])$/i.test(base)) {
+                            return `${base} ${city}`;
+                        }
+                        return `${base}, ${city}`;
                     };
                     const formatYear = (value) => {
                         const raw = String(value || '').trim();
-                        if (!raw) return { display: '', hover: '', isOpen: false };
+                        if (!raw) return { display: '', displayHtml: '', mobileCycle: null };
                         const openMatch = raw.match(/^(\d{4})\s*[\-–—]\s*$/);
                         if (openMatch) {
                             const startYear = openMatch[1];
                             return {
-                                display: `${startYear}→`,
-                                hover: 'en cours',
-                                isOpen: true
+                                display: `${startYear}⤴ en cours`,
+                                displayHtml: `<span class="index-year-open-inline"><span class="index-year-open-base">${startYear}⤴</span><sup class="index-year-open-sup">en cours</sup></span>`,
+                                mobileCycle: [startYear, 'en cours']
                             };
                         }
                         const closedRangeMatch = raw.match(/^(\d{4})\s*[\-–—]\s*(\d{4})$/);
                         if (closedRangeMatch) {
+                            const startYear = closedRangeMatch[1];
+                            const endYear = closedRangeMatch[2];
                             return {
-                                display: `${closedRangeMatch[1]}—${closedRangeMatch[2]}`,
-                                hover: '',
-                                isOpen: false
+                                display: `${startYear}—${endYear}`,
+                                displayHtml: `${startYear}—${endYear}`,
+                                mobileCycle: [startYear, endYear]
                             };
                         }
-                        return { display: raw, hover: '', isOpen: false };
+                        return { display: raw, displayHtml: raw, mobileCycle: null };
                     };
                     const indexData = [
                         { name: "Les Formes Vides", client: "Musee Horta Bruxelles", type: "exposition", year: "2026" },
@@ -1198,52 +1251,73 @@
                             client: formatClient(item.client),
                             type: formatTypology(item.type),
                             yearDisplay: formattedYear.display,
-                            yearHover: formattedYear.hover,
-                            isOpenYear: formattedYear.isOpen,
+                            yearDisplayHtml: formattedYear.displayHtml,
+                            yearMobileCycle: formattedYear.mobileCycle,
                             img: indexImagePool[index % indexImagePool.length]
                         };
                     });
                     
-                    const listContainer = document.getElementById('index-list');
+                    const listContainer = document.getElementById('index-list-body');
                     indexData.forEach(item => {
-                        const row = document.createElement('div');
-                        row.className = 'index-row-container index-body-row index-dev-grid leading-[1.12] py-1 cursor-target transition-all duration-300';
+                        const row = document.createElement('tr');
+                        row.className = 'index-row-container index-body-row cursor-target transition-all duration-300';
                         row.setAttribute('data-img', item.img);
-                        const yearOpenClass = item.isOpenYear ? ' index-col-year-open' : '';
-                        const yearCellAttrs = item.isOpenYear ? ' tabindex="0" role="button" aria-label="Afficher en cours"' : '';
-                        const yearHtml = item.isOpenYear
-                            ? `<span class="index-year-default">${item.yearDisplay}</span><span class="index-year-hover">${item.yearHover}</span>`
-                            : `<span class="index-year-default">${item.yearDisplay}</span>`;
+                        const hasYearCycle = Array.isArray(item.yearMobileCycle) && item.yearMobileCycle.length === 2;
+                        const yearDefaultMarkup = item.yearDisplayHtml || item.yearDisplay;
+                        const yearHtml = hasYearCycle
+                            ? `<span class="index-year-default">${yearDefaultMarkup}</span>
+                               <span class="index-year-mobile-stack" aria-hidden="true">
+                                   <span class="index-year-mobile-a">${item.yearMobileCycle[0]}</span>
+                                   <span class="index-year-mobile-b">${item.yearMobileCycle[1]}</span>
+                               </span>`
+                            : `<span class="index-year-default">${yearDefaultMarkup}</span>`;
+                        const yearClassName = hasYearCycle
+                            ? 'index-text index-col-year index-col-year-cycle transition-colors duration-300'
+                            : 'index-text index-col-year transition-colors duration-300';
                         row.innerHTML = `
-                            <div class="index-text index-col-ref transition-colors duration-300">${item.name}</div>
-                            <div class="hidden md:block index-text index-col-client transition-colors duration-300">${item.client}</div>
-                            <div class="hidden md:block index-text index-col-type transition-colors duration-300">${item.type}</div>
-                            <div class="index-text index-col-year transition-colors duration-300${yearOpenClass}"${yearCellAttrs}>${yearHtml}</div>
+                            <td class="index-text index-col-ref transition-colors duration-300">${item.name}</td>
+                            <td class="index-text index-col-client transition-colors duration-300">${item.client}</td>
+                            <td class="index-text index-col-type transition-colors duration-300">${item.type}</td>
+                            <td class="${yearClassName}">${yearHtml}</td>
                         `;
                         listContainer.appendChild(row);
                     });
-                    const openYearCells = listContainer.querySelectorAll('.index-col-year-open');
-                    openYearCells.forEach((cell) => {
-                        const toggleActiveState = () => {
-                            cell.classList.toggle('is-active');
-                        };
-                        cell.addEventListener('click', (event) => {
-                            event.stopPropagation();
-                            toggleActiveState();
+                    let mobileYearTickerId = null;
+                    let mobileYearTickerPhase = 0;
+                    const MOBILE_YEAR_TICK_MS = 3000;
+                    const applyMobileYearTicker = () => {
+                        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+                        const cycleCells = Array.from(listContainer.querySelectorAll('.index-col-year-cycle'));
+                        cycleCells.forEach((cell) => {
+                            cell.classList.toggle('is-mobile-year-phase-b', isMobile && mobileYearTickerPhase === 1);
                         });
-                        cell.addEventListener('keydown', (event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                toggleActiveState();
-                            }
-                        });
-                    });
-                    document.addEventListener('click', () => {
-                        openYearCells.forEach((cell) => cell.classList.remove('is-active'));
-                    });
-
-                    const syncIndexYearColumnWidth = () => {};
-                    window.syncIndexYearColumnWidth = syncIndexYearColumnWidth;
+                    };
+                    const stopMobileYearTicker = () => {
+                        if (mobileYearTickerId !== null) {
+                            window.clearInterval(mobileYearTickerId);
+                            mobileYearTickerId = null;
+                        }
+                    };
+                    const handleMobileYearTicker = () => {
+                        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+                        if (!isMobile) {
+                            stopMobileYearTicker();
+                            mobileYearTickerPhase = 0;
+                            applyMobileYearTicker();
+                            return;
+                        }
+                        applyMobileYearTicker();
+                        if (mobileYearTickerId === null) {
+                            mobileYearTickerId = window.setInterval(() => {
+                                mobileYearTickerPhase = mobileYearTickerPhase === 0 ? 1 : 0;
+                                applyMobileYearTicker();
+                            }, MOBILE_YEAR_TICK_MS);
+                        }
+                    };
+                    handleMobileYearTicker();
+                    window.addEventListener('resize', () => {
+                        window.requestAnimationFrame(handleMobileYearTicker);
+                    }, { passive: true });
                 </script>
             </div>
         </section>
@@ -2838,9 +2912,6 @@
                     indexControlsValue.textContent = `Actuel: ${caseLabel} • écart ${normalizedGap.toFixed(2)} • taille ${normalizedScale.toFixed(2)}`;
                     localStorage.setItem('devIndexColumnGap', String(normalizedGap));
                     localStorage.setItem('devIndexBodyScale', String(normalizedScale));
-                    if (typeof window.syncIndexYearColumnWidth === 'function') {
-                        window.syncIndexYearColumnWidth();
-                    }
                 };
                 const detectDevContext = () => {
                     if (!indexSection) return 'hero';
@@ -2934,8 +3005,8 @@
                 };
                 const indexDefaultPreset = {
                     case: "normalcaps",
-                    columnGap: 3.2,
-                    bodyScale: 0.75
+                    columnGap: 1.0,
+                    bodyScale: 1.0
                 };
                 const defaultPresetVersion = "2026-03-17-video-loop";
                 if (localStorage.getItem('devHeroDefaultsVersion') !== defaultPresetVersion) {
@@ -2954,7 +3025,7 @@
                     localStorage.setItem('devHeroLineHeight', String(defaultPreset.lineHeight));
                     localStorage.setItem('devHeroDefaultsVersion', defaultPresetVersion);
                 }
-                const indexDefaultPresetVersion = "2026-03-08";
+                const indexDefaultPresetVersion = "2026-03-18-index-fluid-table";
                 if (localStorage.getItem('devIndexDefaultsVersion') !== indexDefaultPresetVersion) {
                     localStorage.setItem('devIndexCase', indexDefaultPreset.case);
                     localStorage.setItem('devIndexColumnGap', String(indexDefaultPreset.columnGap));
