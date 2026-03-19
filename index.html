@@ -1526,6 +1526,7 @@
                 let heroMediaAutoTimer = null;
                 let shuffledHeroMediaQueue = [];
                 let heroVideoLoadToken = 0;
+                let activeVideoPendingSince = 0;
                 let heroStaggerPreloadTimer = null;
                 const heroOverlayFadeMs = 260;
                 const heroManualPauseDurationMs = 10000;
@@ -1569,7 +1570,18 @@
                 if (heroVideoSourceNode && heroVideoSourceNode.getAttribute('src')) {
                     activeHeroVideoSrc = heroVideoSourceNode.getAttribute('src');
                 }
-                const getSlideDurationMs = (slide) => (slide && slide.type === 'video' ? 3000 : 100);
+                const imageSlideDurationMs = 100;
+                const videoSlideDurationMs = 3000;
+                const isActiveVideoActuallyVisible = () => {
+                    const activeSlide = heroMediaSlides[activeHeroMediaSlide];
+                    if (!activeSlide || activeSlide.type !== 'video') return false;
+                    const inlineVisibility = heroVideoElement.style.visibility;
+                    const inlineOpacity = heroVideoElement.style.opacity;
+                    const isVisible = inlineVisibility !== 'hidden' && inlineOpacity !== '0';
+                    return isVisible && heroVideoElement.readyState >= 2;
+                };
+                const getSlideDurationMs = () =>
+                    isActiveVideoActuallyVisible() ? videoSlideDurationMs : imageSlideDurationMs;
                 const buildShuffledQueue = (excludeIndex) => {
                     const indexes = heroMediaSlides
                         .map((_, idx) => idx)
@@ -1813,6 +1825,7 @@
                     heroCarouselImage.style.objectPosition = activeHeroMediaObjectPosition;
                     preloadHeroMediaWindow(normalized);
                     if (slide.type === 'video') {
+                        activeVideoPendingSince = Date.now();
                         imageSlidesSinceLastVideo = 0;
                         lastShownVideoSlide = normalized;
                         const sourceWillChange = activeHeroVideoSrc !== slide.src;
@@ -1837,6 +1850,7 @@
                                 heroVideoElement.style.visibility = 'visible';
                                 heroVideoElement.style.opacity = '1';
                                 heroReadyVideoSrcSet.add(slide.src);
+                                activeVideoPendingSince = 0;
                                 playHeroLoopVideo();
                                 waitForHeroVideoFrame().finally(() => {
                                     if (activeLoadToken !== heroVideoLoadToken) return;
@@ -1858,6 +1872,7 @@
                         return;
                     }
 
+                    activeVideoPendingSince = 0;
                     imageSlidesSinceLastVideo = Math.min(minImageSlidesBetweenVideos, imageSlidesSinceLastVideo + 1);
                     const activeLoadToken = ++heroVideoLoadToken;
                     preloadImageSlide(slide.src).then((loadedImage) => {
@@ -1875,8 +1890,19 @@
                     if (heroMediaSlides.length <= 1) return;
                     const now = Date.now();
                     const manualPauseRemainingMs = Math.max(0, heroManualPauseUntil - now);
-                    const currentSlide = heroMediaSlides[activeHeroMediaSlide];
-                    const delayMs = manualPauseRemainingMs || getSlideDurationMs(currentSlide);
+                    const activeSlide = heroMediaSlides[activeHeroMediaSlide];
+                    if (!manualPauseRemainingMs && activeSlide && activeSlide.type === 'video' && !isActiveVideoActuallyVisible()) {
+                        const videoWaitProbeMs = 120;
+                        const maxVideoWaitBeforeSkipMs = 1400;
+                        const elapsedWaitMs = activeVideoPendingSince > 0 ? (now - activeVideoPendingSince) : maxVideoWaitBeforeSkipMs;
+                        if (elapsedWaitMs < maxVideoWaitBeforeSkipMs) {
+                            heroMediaAutoTimer = window.setTimeout(() => {
+                                scheduleNextRandomHeroSlide();
+                            }, videoWaitProbeMs);
+                            return;
+                        }
+                    }
+                    const delayMs = manualPauseRemainingMs || getSlideDurationMs();
                     heroMediaAutoTimer = window.setTimeout(() => {
                         if (Date.now() < heroManualPauseUntil) {
                             scheduleNextRandomHeroSlide();
